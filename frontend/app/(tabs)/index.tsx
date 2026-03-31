@@ -211,6 +211,29 @@ export default function HomeScreen() {
           )}
         </View>
 
+        {/* Official YouTube Channel */}
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Our Channel</Text>
+          </View>
+          <TouchableOpacity
+            style={styles.channelCard}
+            onPress={() => Linking.openURL('https://www.youtube.com/@Thecitizensmission')}
+          >
+            <View style={styles.channelIconContainer}>
+              <Ionicons name="logo-youtube" size={32} color="#FF0000" />
+            </View>
+            <View style={styles.channelInfo}>
+              <Text style={styles.channelName}>The Citizens Mission</Text>
+              <Text style={styles.channelHandle}>@Thecitizensmission</Text>
+              <Text style={styles.channelDescription}>Bible Studies & Teaching</Text>
+            </View>
+            <View style={styles.subscribeButton}>
+              <Ionicons name="open-outline" size={20} color={colors.primary} />
+            </View>
+          </TouchableOpacity>
+        </View>
+
         {/* Media Section - YouTube & Spotify */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
@@ -498,6 +521,45 @@ const styles = StyleSheet.create({
   mediaIconsRow: {
     flexDirection: 'row',
     marginBottom: 12,
+  },
+  channelCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.surface,
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  channelIconContainer: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: 'rgba(255, 0, 0, 0.1)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  channelInfo: {
+    flex: 1,
+    marginLeft: 14,
+  },
+  channelName: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: colors.text,
+  },
+  channelHandle: {
+    fontSize: 13,
+    color: colors.primary,
+    marginTop: 2,
+  },
+  channelDescription: {
+    fontSize: 12,
+    color: colors.textSecondary,
+    marginTop: 2,
+  },
+  subscribeButton: {
+    padding: 8,
   },
   quickActions: {
     flexDirection: 'row',
