@@ -8,6 +8,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   Alert,
+  Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -15,6 +16,7 @@ import { useRouter } from 'expo-router';
 import { useUserStore } from '../src/store/userStore';
 import { Button, Input, colors } from '../src/components/ThemedComponents';
 import { verseApi } from '../src/services/api';
+import { imageService, ImageResult } from '../src/services/image';
 
 export default function ShareVerseScreen() {
   const router = useRouter();
@@ -22,7 +24,18 @@ export default function ShareVerseScreen() {
   const [verseReference, setVerseReference] = useState('');
   const [verseText, setVerseText] = useState('');
   const [reflection, setReflection] = useState('');
+  const [image, setImage] = useState<ImageResult | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleAddImage = () => {
+    imageService.showImagePickerOptions((result) => {
+      setImage(result);
+    });
+  };
+
+  const handleRemoveImage = () => {
+    setImage(null);
+  };
 
   const handleShare = async () => {
     if (!verseReference.trim() || !verseText.trim()) {
@@ -43,6 +56,7 @@ export default function ShareVerseScreen() {
         reflection: reflection.trim() || undefined,
         shared_by_id: currentUser.id,
         shared_by_name: currentUser.name,
+        image: image?.base64 || undefined,
       });
       Alert.alert('Success', 'Verse shared with the community!', [
         { text: 'OK', onPress: () => router.back() },
@@ -104,6 +118,29 @@ export default function ShareVerseScreen() {
             multiline
           />
 
+          {/* Image Attachment Section */}
+          <View style={styles.imageSection}>
+            <Text style={styles.inputLabel}>Attach Image</Text>
+            
+            {image ? (
+              <View style={styles.imagePreviewContainer}>
+                <Image
+                  source={{ uri: `data:image/jpeg;base64,${image.base64}` }}
+                  style={styles.imagePreview}
+                  resizeMode="cover"
+                />
+                <TouchableOpacity style={styles.removeImageButton} onPress={handleRemoveImage}>
+                  <Ionicons name="close-circle" size={28} color={colors.error} />
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <TouchableOpacity style={styles.addImageButton} onPress={handleAddImage}>
+                <Ionicons name="image-outline" size={32} color={colors.primary} />
+                <Text style={styles.addImageText}>Add an image to your verse</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+
           <Button
             title="Share Verse"
             onPress={handleShare}
@@ -162,6 +199,47 @@ const styles = StyleSheet.create({
     color: colors.text,
     fontSize: 14,
     lineHeight: 20,
+  },
+  imageSection: {
+    marginBottom: 16,
+  },
+  inputLabel: {
+    color: colors.text,
+    fontSize: 14,
+    marginBottom: 8,
+    fontWeight: '500',
+  },
+  addImageButton: {
+    backgroundColor: colors.surface,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: colors.border,
+    borderStyle: 'dashed',
+    padding: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  addImageText: {
+    color: colors.textSecondary,
+    marginTop: 8,
+    fontSize: 14,
+  },
+  imagePreviewContainer: {
+    position: 'relative',
+    borderRadius: 12,
+    overflow: 'hidden',
+  },
+  imagePreview: {
+    width: '100%',
+    height: 200,
+    borderRadius: 12,
+  },
+  removeImageButton: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    borderRadius: 14,
   },
   shareButton: {
     marginTop: 16,

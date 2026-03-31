@@ -9,7 +9,7 @@ import {
   Platform,
   Alert,
   Switch,
-  TextInput,
+  Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -17,6 +17,7 @@ import { useRouter } from 'expo-router';
 import { useUserStore } from '../src/store/userStore';
 import { Button, Input, colors } from '../src/components/ThemedComponents';
 import { noteApi } from '../src/services/api';
+import { imageService, ImageResult } from '../src/services/image';
 
 export default function CreateNoteScreen() {
   const router = useRouter();
@@ -26,7 +27,18 @@ export default function CreateNoteScreen() {
   const [scriptureReference, setScriptureReference] = useState('');
   const [tagsInput, setTagsInput] = useState('');
   const [isPrivate, setIsPrivate] = useState(true);
+  const [image, setImage] = useState<ImageResult | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleAddImage = () => {
+    imageService.showImagePickerOptions((result) => {
+      setImage(result);
+    });
+  };
+
+  const handleRemoveImage = () => {
+    setImage(null);
+  };
 
   const handleCreate = async () => {
     if (!title.trim() || !content.trim()) {
@@ -53,6 +65,7 @@ export default function CreateNoteScreen() {
         scripture_reference: scriptureReference.trim() || undefined,
         tags,
         is_private: isPrivate,
+        image: image?.base64 || undefined,
       });
       Alert.alert('Success', 'Note saved!', [
         { text: 'OK', onPress: () => router.back() },
@@ -105,7 +118,7 @@ export default function CreateNoteScreen() {
             placeholder="Write your study notes..."
             label="Content *"
             multiline
-            inputStyle={{ height: 200 }}
+            inputStyle={{ height: 150 }}
           />
 
           <Input
@@ -115,6 +128,29 @@ export default function CreateNoteScreen() {
             label="Tags"
             icon="pricetag-outline"
           />
+
+          {/* Image Attachment Section */}
+          <View style={styles.imageSection}>
+            <Text style={styles.inputLabel}>Attach Image</Text>
+            
+            {image ? (
+              <View style={styles.imagePreviewContainer}>
+                <Image
+                  source={{ uri: `data:image/jpeg;base64,${image.base64}` }}
+                  style={styles.imagePreview}
+                  resizeMode="cover"
+                />
+                <TouchableOpacity style={styles.removeImageButton} onPress={handleRemoveImage}>
+                  <Ionicons name="close-circle" size={28} color={colors.error} />
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <TouchableOpacity style={styles.addImageButton} onPress={handleAddImage}>
+                <Ionicons name="camera-outline" size={32} color={colors.primary} />
+                <Text style={styles.addImageText}>Add a photo to your note</Text>
+              </TouchableOpacity>
+            )}
+          </View>
 
           <View style={styles.switchRow}>
             <View style={styles.switchInfo}>
@@ -174,6 +210,47 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: 16,
+  },
+  imageSection: {
+    marginBottom: 16,
+  },
+  inputLabel: {
+    color: colors.text,
+    fontSize: 14,
+    marginBottom: 8,
+    fontWeight: '500',
+  },
+  addImageButton: {
+    backgroundColor: colors.surface,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: colors.border,
+    borderStyle: 'dashed',
+    padding: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  addImageText: {
+    color: colors.textSecondary,
+    marginTop: 8,
+    fontSize: 14,
+  },
+  imagePreviewContainer: {
+    position: 'relative',
+    borderRadius: 12,
+    overflow: 'hidden',
+  },
+  imagePreview: {
+    width: '100%',
+    height: 200,
+    borderRadius: 12,
+  },
+  removeImageButton: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    borderRadius: 14,
   },
   switchRow: {
     flexDirection: 'row',

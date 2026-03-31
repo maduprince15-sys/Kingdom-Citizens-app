@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   RefreshControl,
   Alert,
+  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -16,6 +17,8 @@ import { Card, Button, colors, EmptyState } from '../../src/components/ThemedCom
 import { sessionApi } from '../../src/services/api';
 import { StudySession } from '../../src/types';
 import { format, parseISO } from 'date-fns';
+import { calendarService } from '../../src/services/calendar';
+import { notificationService } from '../../src/services/notifications';
 
 export default function SessionsScreen() {
   const router = useRouter();
@@ -61,13 +64,39 @@ export default function SessionsScreen() {
     try {
       if (isAttending) {
         await sessionApi.cancelAttendance(sessionId, currentUser.id);
+        // Cancel notification reminder
+        if (Platform.OS !== 'web') {
+          await notificationService.cancelSessionReminder(sessionId);
+        }
       } else {
         await sessionApi.attend(sessionId, currentUser.id);
+        // Schedule notification reminder
+        const session = sessions.find(s => s.id === sessionId);
+        if (session && Platform.OS !== 'web') {
+          await notificationService.scheduleSessionReminder(
+            sessionId,
+            session.title,
+            session.date,
+            session.time,
+            60 // 60 minutes before
+          );
+        }
       }
       loadSessions();
     } catch (error) {
       Alert.alert('Error', 'Failed to update attendance');
     }
+  };
+
+  const handleAddToCalendar = async (session: StudySession) => {
+    await calendarService.addSessionToCalendar(
+      session.title,
+      session.description,
+      session.date,
+      session.time,
+      session.location,
+      session.scripture_reference
+    );
   };
 
   return (
@@ -149,19 +178,28 @@ export default function SessionsScreen() {
                   </View>
                 </View>
                 {filter === 'upcoming' && (
-                  <TouchableOpacity
-                    style={[styles.attendButton, isAttending && styles.attendingButton]}
-                    onPress={() => handleAttend(session.id, isAttending)}
-                  >
-                    <Ionicons
-                      name={isAttending ? 'checkmark-circle' : 'add-circle-outline'}
-                      size={18}
-                      color={isAttending ? colors.success : colors.primary}
-                    />
-                    <Text style={[styles.attendText, isAttending && { color: colors.success }]}>
-                      {isAttending ? 'Attending' : 'Join'}
-                    </Text>
-                  </TouchableOpacity>
+                  <View style={styles.actionButtonsRow}>
+                    <TouchableOpacity
+                      style={[styles.attendButton, isAttending && styles.attendingButton]}
+                      onPress={() => handleAttend(session.id, isAttending)}
+                    >
+                      <Ionicons
+                        name={isAttending ? 'checkmark-circle' : 'add-circle-outline'}
+                        size={18}
+                        color={isAttending ? colors.success : colors.primary}
+                      />
+                      <Text style={[styles.attendText, isAttending && { color: colors.success }]}>
+                        {isAttending ? 'Attending' : 'Join'}
+                      </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.calendarButton}
+                      onPress={() => handleAddToCalendar(session)}
+                    >
+                      <Ionicons name="calendar-outline" size={18} color={colors.primary} />
+                      <Text style={styles.calendarText}>Add to Calendar</Text>
+                    </TouchableOpacity>
+                  </View>
                 )}
               </Card>
             );
@@ -278,11 +316,16 @@ const styles = StyleSheet.create({
     marginLeft: 4,
     fontWeight: '500',
   },
+  actionButtonsRow: {
+    flexDirection: 'row',
+    marginTop: 12,
+    gap: 8,
+  },
   attendButton: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 12,
     paddingVertical: 10,
     borderRadius: 8,
     backgroundColor: colors.surfaceLight,
@@ -294,5 +337,22 @@ const styles = StyleSheet.create({
     marginLeft: 6,
     color: colors.primary,
     fontWeight: '600',
+  },
+  calendarButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 10,
+    borderRadius: 8,
+    backgroundColor: 'rgba(218, 165, 32, 0.1)',
+    borderWidth: 1,
+    borderColor: colors.primary,
+  },
+  calendarText: {
+    marginLeft: 6,
+    color: colors.primary,
+    fontWeight: '600',
+    fontSize: 13,
   },
 });

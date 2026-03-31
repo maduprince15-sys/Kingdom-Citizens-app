@@ -44,6 +44,7 @@ export interface VerseDiscussion {
   shared_by_name: string;
   reflection?: string;
   group_id?: string;
+  image?: string;
   comments: Comment[];
   likes: string[];
   created_at: string;
@@ -80,6 +81,7 @@ export interface StudyNote {
   session_id?: string;
   tags: string[];
   is_private: boolean;
+  image?: string;
   created_at: string;
   updated_at: string;
 }

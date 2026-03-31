@@ -16,6 +16,7 @@ import { useRouter } from 'expo-router';
 import { useUserStore } from '../src/store/userStore';
 import { Button, Input, colors } from '../src/components/ThemedComponents';
 import { announcementApi } from '../src/services/api';
+import { notificationService } from '../src/services/notifications';
 
 export default function CreateAnnouncementScreen() {
   const router = useRouter();
@@ -45,6 +46,12 @@ export default function CreateAnnouncementScreen() {
         author_name: currentUser.name,
         is_pinned: isPinned,
       });
+      
+      // Send notification about new announcement
+      if (Platform.OS !== 'web') {
+        await notificationService.notifyNewAnnouncement(title.trim(), currentUser.name);
+      }
+      
       Alert.alert('Success', 'Announcement posted!', [
         { text: 'OK', onPress: () => router.back() },
       ]);

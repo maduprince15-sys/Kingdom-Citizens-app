@@ -16,6 +16,7 @@ import { useRouter } from 'expo-router';
 import { useUserStore } from '../src/store/userStore';
 import { Button, Input, colors } from '../src/components/ThemedComponents';
 import { prayerApi } from '../src/services/api';
+import { notificationService } from '../src/services/notifications';
 
 export default function CreatePrayerScreen() {
   const router = useRouter();
@@ -45,6 +46,12 @@ export default function CreatePrayerScreen() {
         requested_by_name: currentUser.name,
         is_anonymous: isAnonymous,
       });
+      
+      // Send notification about new prayer request (for other users on the same device)
+      if (Platform.OS !== 'web') {
+        await notificationService.notifyNewPrayer(title.trim(), currentUser.name, isAnonymous);
+      }
+      
       Alert.alert('Success', 'Prayer request submitted!', [
         { text: 'OK', onPress: () => router.back() },
       ]);

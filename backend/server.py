@@ -121,6 +121,7 @@ class VerseDiscussion(BaseModel):
     shared_by_name: str
     reflection: Optional[str] = None
     group_id: Optional[str] = None
+    image: Optional[str] = None  # Base64 encoded image
     comments: List[dict] = []
     likes: List[str] = []  # member IDs
     created_at: datetime = Field(default_factory=datetime.utcnow)
@@ -132,6 +133,7 @@ class VerseDiscussionCreate(BaseModel):
     shared_by_name: str
     reflection: Optional[str] = None
     group_id: Optional[str] = None
+    image: Optional[str] = None  # Base64 encoded image
 
 class CommentCreate(BaseModel):
     member_id: str
@@ -175,6 +177,7 @@ class StudyNote(BaseModel):
     session_id: Optional[str] = None
     tags: List[str] = []
     is_private: bool = True
+    image: Optional[str] = None  # Base64 encoded image
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
 
@@ -186,6 +189,7 @@ class StudyNoteCreate(BaseModel):
     session_id: Optional[str] = None
     tags: List[str] = []
     is_private: bool = True
+    image: Optional[str] = None  # Base64 encoded image
 
 class StudyNoteUpdate(BaseModel):
     title: Optional[str] = None
@@ -193,6 +197,7 @@ class StudyNoteUpdate(BaseModel):
     scripture_reference: Optional[str] = None
     tags: Optional[List[str]] = None
     is_private: Optional[bool] = None
+    image: Optional[str] = None  # Base64 encoded image
 
 # Message Models
 class Message(BaseModel):
