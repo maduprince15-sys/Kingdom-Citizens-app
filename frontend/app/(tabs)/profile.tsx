@@ -182,6 +182,16 @@ export default function ProfileScreen() {
             <Text style={styles.menuText}>Media (YouTube & Spotify)</Text>
             <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
           </TouchableOpacity>
+
+          {(currentUser?.role === 'admin' || currentUser?.role === 'leader') && (
+            <TouchableOpacity style={[styles.menuItem, styles.adminMenuItem]} onPress={() => router.push('/admin')}>
+              <View style={[styles.menuIcon, { backgroundColor: 'rgba(255, 107, 107, 0.1)' }]}>
+                <Ionicons name="shield" size={20} color="#FF6B6B" />
+              </View>
+              <Text style={styles.menuText}>Admin Panel</Text>
+              <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
+            </TouchableOpacity>
+          )}
         </View>
 
         {/* Groups */}
@@ -339,6 +349,9 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     color: colors.text,
+  },
+  adminMenuItem: {
+    borderColor: 'rgba(255, 107, 107, 0.3)',
   },
   groupRow: {
     flexDirection: 'row',
