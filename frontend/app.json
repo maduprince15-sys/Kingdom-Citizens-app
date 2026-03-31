@@ -17,17 +17,19 @@
       }
     },
     "android": {
+      "package": "com.kingdomcitizens.biblestudies",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/logo.jpg",
         "backgroundColor": "#000000"
       },
       "edgeToEdgeEnabled": true,
       "permissions": [
-        "CAMERA",
-        "READ_EXTERNAL_STORAGE",
-        "WRITE_EXTERNAL_STORAGE",
-        "READ_CALENDAR",
-        "WRITE_CALENDAR"
+        "android.permission.CAMERA",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.READ_CALENDAR",
+        "android.permission.WRITE_CALENDAR",
+        "android.permission.RECORD_AUDIO"
       ]
     },
     "web": {
@@ -67,10 +69,18 @@
         {
           "calendarPermission": "Allow Kingdom Citizens to add study sessions to your calendar"
         }
-      ]
+      ],
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "fa5738ac-2621-4cd3-953f-14c2b49a5a2e"
+      }
+    },
+    "owner": "kingdomcitizens"
   }
 }
