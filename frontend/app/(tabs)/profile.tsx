@@ -174,6 +174,14 @@ export default function ProfileScreen() {
             <Text style={styles.menuText}>Verse Discussions</Text>
             <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
           </TouchableOpacity>
+
+          <TouchableOpacity style={styles.menuItem} onPress={() => router.push('/media')}>
+            <View style={styles.menuIcon}>
+              <Ionicons name="play-circle" size={20} color={colors.primary} />
+            </View>
+            <Text style={styles.menuText}>Media (YouTube & Spotify)</Text>
+            <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
+          </TouchableOpacity>
         </View>
 
         {/* Groups */}

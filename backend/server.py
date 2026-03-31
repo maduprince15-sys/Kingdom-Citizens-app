@@ -236,6 +236,32 @@ class AnnouncementCreate(BaseModel):
     group_id: Optional[str] = None
     is_pinned: bool = False
 
+# Media Content Models (YouTube & Spotify)
+class MediaContent(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    title: str
+    description: Optional[str] = None
+    media_type: str  # 'youtube' or 'spotify'
+    category: str  # 'sermon', 'worship', 'playlist', 'recommendation'
+    url: str
+    thumbnail: Optional[str] = None  # Base64 or URL
+    author_id: str
+    author_name: str
+    is_official: bool = False  # True for admin-posted content
+    likes: List[str] = []
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+class MediaContentCreate(BaseModel):
+    title: str
+    description: Optional[str] = None
+    media_type: str
+    category: str
+    url: str
+    thumbnail: Optional[str] = None
+    author_id: str
+    author_name: str
+    is_official: bool = False
+
 # ==================== API ROUTES ====================
 
 @api_router.get("/")
@@ -629,6 +655,55 @@ async def delete_announcement(announcement_id: str):
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Announcement not found")
     return {"message": "Announcement deleted"}
+
+# ==================== MEDIA CONTENT ROUTES ====================
+
+@api_router.post("/media", response_model=MediaContent)
+async def create_media_content(input: MediaContentCreate):
+    media = MediaContent(**input.dict())
+    await db.media.insert_one(media.dict())
+    return media
+
+@api_router.get("/media", response_model=List[MediaContent])
+async def get_media_content(
+    media_type: Optional[str] = None,
+    category: Optional[str] = None,
+    official_only: bool = False
+):
+    query = {}
+    if media_type:
+        query["media_type"] = media_type
+    if category:
+        query["category"] = category
+    if official_only:
+        query["is_official"] = True
+    
+    media = await db.media.find(query).sort([("is_official", -1), ("created_at", -1)]).to_list(1000)
+    return [MediaContent(**m) for m in media]
+
+@api_router.get("/media/{media_id}", response_model=MediaContent)
+async def get_media_item(media_id: str):
+    media = await db.media.find_one({"id": media_id})
+    if not media:
+        raise HTTPException(status_code=404, detail="Media not found")
+    return MediaContent(**media)
+
+@api_router.post("/media/{media_id}/like/{member_id}")
+async def like_media(media_id: str, member_id: str):
+    await db.media.update_one({"id": media_id}, {"$addToSet": {"likes": member_id}})
+    return {"message": "Liked"}
+
+@api_router.delete("/media/{media_id}/like/{member_id}")
+async def unlike_media(media_id: str, member_id: str):
+    await db.media.update_one({"id": media_id}, {"$pull": {"likes": member_id}})
+    return {"message": "Unliked"}
+
+@api_router.delete("/media/{media_id}")
+async def delete_media_content(media_id: str):
+    result = await db.media.delete_one({"id": media_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Media not found")
+    return {"message": "Media deleted"}
 
 # Include the router in the main app
 app.include_router(api_router)

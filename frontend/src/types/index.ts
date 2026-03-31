@@ -107,3 +107,18 @@ export interface Announcement {
   is_pinned: boolean;
   created_at: string;
 }
+
+export interface MediaContent {
+  id: string;
+  title: string;
+  description?: string;
+  media_type: 'youtube' | 'spotify';
+  category: 'sermon' | 'worship' | 'playlist' | 'recommendation';
+  url: string;
+  thumbnail?: string;
+  author_id: string;
+  author_name: string;
+  is_official: boolean;
+  likes: string[];
+  created_at: string;
+}

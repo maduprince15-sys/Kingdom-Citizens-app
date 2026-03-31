@@ -8,14 +8,15 @@ import {
   TouchableOpacity,
   RefreshControl,
   Alert,
+  Linking,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useUserStore } from '../../src/store/userStore';
 import { Card, Button, colors, EmptyState } from '../../src/components/ThemedComponents';
-import { sessionApi, announcementApi, verseApi } from '../../src/services/api';
-import { StudySession, Announcement, VerseDiscussion } from '../../src/types';
+import { sessionApi, announcementApi, verseApi, mediaApi } from '../../src/services/api';
+import { StudySession, Announcement, VerseDiscussion, MediaContent } from '../../src/types';
 import { format, parseISO } from 'date-fns';
 
 export default function HomeScreen() {
@@ -24,18 +25,21 @@ export default function HomeScreen() {
   const [upcomingSessions, setUpcomingSessions] = useState<StudySession[]>([]);
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [recentVerses, setRecentVerses] = useState<VerseDiscussion[]>([]);
+  const [mediaContent, setMediaContent] = useState<MediaContent[]>([]);
   const [refreshing, setRefreshing] = useState(false);
 
   const loadData = useCallback(async () => {
     try {
-      const [sessionsRes, announcementsRes, versesRes] = await Promise.all([
+      const [sessionsRes, announcementsRes, versesRes, mediaRes] = await Promise.all([
         sessionApi.getUpcoming(),
         announcementApi.getAll(),
         verseApi.getAll(),
+        mediaApi.getAll(),
       ]);
       setUpcomingSessions(sessionsRes.data.slice(0, 3));
       setAnnouncements(announcementsRes.data.slice(0, 3));
       setRecentVerses(versesRes.data.slice(0, 3));
+      setMediaContent(mediaRes.data.slice(0, 4));
     } catch (error) {
       console.error('Failed to load data:', error);
     }
@@ -207,6 +211,69 @@ export default function HomeScreen() {
           )}
         </View>
 
+        {/* Media Section - YouTube & Spotify */}
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Media</Text>
+            <TouchableOpacity onPress={() => router.push('/media')}>
+              <Text style={styles.seeAll}>See All</Text>
+            </TouchableOpacity>
+          </View>
+
+          {mediaContent.length > 0 ? (
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.mediaScroll}>
+              {mediaContent.map((item) => (
+                <TouchableOpacity
+                  key={item.id}
+                  style={styles.mediaCard}
+                  onPress={() => Linking.openURL(item.url)}
+                >
+                  <View style={[
+                    styles.mediaIconContainer,
+                    { backgroundColor: item.media_type === 'youtube' ? '#FF0000' : '#1DB954' }
+                  ]}>
+                    <Ionicons
+                      name={item.media_type === 'youtube' ? 'logo-youtube' : 'logo-spotify'}
+                      size={24}
+                      color="#fff"
+                    />
+                  </View>
+                  <Text style={styles.mediaTitle} numberOfLines={2}>{item.title}</Text>
+                  <View style={styles.mediaCategoryTag}>
+                    <Text style={styles.mediaCategoryText}>
+                      {item.category === 'sermon' ? 'Bible Study' : 
+                       item.category === 'worship' ? 'Worship' :
+                       item.category === 'playlist' ? 'Playlist' : 'Recommended'}
+                    </Text>
+                  </View>
+                  {item.is_official && (
+                    <View style={styles.officialTag}>
+                      <Ionicons name="checkmark-circle" size={10} color={colors.primary} />
+                      <Text style={styles.officialTagText}>Official</Text>
+                    </View>
+                  )}
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          ) : (
+            <Card>
+              <View style={styles.mediaEmptyState}>
+                <View style={styles.mediaIconsRow}>
+                  <Ionicons name="logo-youtube" size={28} color="#FF0000" />
+                  <Ionicons name="logo-spotify" size={28} color="#1DB954" style={{ marginLeft: 12 }} />
+                </View>
+                <Text style={styles.emptyText}>No media shared yet</Text>
+                <Button
+                  title="Add Media"
+                  onPress={() => router.push('/add-media')}
+                  variant="outline"
+                  style={{ marginTop: 12 }}
+                />
+              </View>
+            </Card>
+          )}
+        </View>
+
         {/* Quick Actions */}
         <View style={styles.quickActions}>
           <TouchableOpacity style={styles.actionButton} onPress={() => router.push('/share-verse')}>
@@ -221,9 +288,9 @@ export default function HomeScreen() {
             <Ionicons name="heart" size={24} color={colors.primary} />
             <Text style={styles.actionText}>Prayer Request</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.actionButton} onPress={() => router.push('/notes')}>
-            <Ionicons name="document-text" size={24} color={colors.primary} />
-            <Text style={styles.actionText}>My Notes</Text>
+          <TouchableOpacity style={styles.actionButton} onPress={() => router.push('/media')}>
+            <Ionicons name="play-circle" size={24} color={colors.primary} />
+            <Text style={styles.actionText}>Media</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -373,6 +440,64 @@ const styles = StyleSheet.create({
   emptyText: {
     color: colors.textSecondary,
     textAlign: 'center',
+  },
+  mediaScroll: {
+    marginHorizontal: -16,
+    paddingHorizontal: 16,
+  },
+  mediaCard: {
+    width: 140,
+    backgroundColor: colors.surface,
+    borderRadius: 12,
+    padding: 12,
+    marginRight: 12,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  mediaIconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 10,
+  },
+  mediaTitle: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: colors.text,
+    marginBottom: 8,
+    lineHeight: 18,
+  },
+  mediaCategoryTag: {
+    backgroundColor: colors.surfaceLight,
+    paddingVertical: 3,
+    paddingHorizontal: 6,
+    borderRadius: 4,
+    alignSelf: 'flex-start',
+  },
+  mediaCategoryText: {
+    fontSize: 10,
+    color: colors.textSecondary,
+    textTransform: 'uppercase',
+  },
+  officialTag: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 6,
+  },
+  officialTagText: {
+    fontSize: 10,
+    color: colors.primary,
+    marginLeft: 2,
+  },
+  mediaEmptyState: {
+    alignItems: 'center',
+    paddingVertical: 8,
+  },
+  mediaIconsRow: {
+    flexDirection: 'row',
+    marginBottom: 12,
   },
   quickActions: {
     flexDirection: 'row',

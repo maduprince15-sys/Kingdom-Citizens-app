@@ -8,6 +8,7 @@ import {
   StudyNote,
   Message,
   Announcement,
+  MediaContent,
 } from '../types';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
@@ -114,6 +115,19 @@ export const announcementApi = {
   togglePin: (id: string, pin: boolean) =>
     api.put(`/announcements/${id}/pin`, null, { params: { pin } }),
   delete: (id: string) => api.delete(`/announcements/${id}`),
+};
+
+// Media Content API (YouTube & Spotify)
+export const mediaApi = {
+  create: (data: Partial<MediaContent>) => api.post<MediaContent>('/media', data),
+  getAll: (mediaType?: string, category?: string, officialOnly?: boolean) =>
+    api.get<MediaContent[]>('/media', {
+      params: { media_type: mediaType, category, official_only: officialOnly },
+    }),
+  getById: (id: string) => api.get<MediaContent>(`/media/${id}`),
+  like: (mediaId: string, memberId: string) => api.post(`/media/${mediaId}/like/${memberId}`),
+  unlike: (mediaId: string, memberId: string) => api.delete(`/media/${mediaId}/like/${memberId}`),
+  delete: (id: string) => api.delete(`/media/${id}`),
 };
 
 export default api;
