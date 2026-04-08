@@ -1,196 +1,113 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  ScrollView,
-  KeyboardAvoidingView,
-  Platform,
-  Alert,
+  View, Text, TextInput, TouchableOpacity, StyleSheet,
+  KeyboardAvoidingView, Platform, ScrollView, ActivityIndicator, Alert
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { useUserStore } from '../src/store/userStore';
-import { Button, Input, colors, LoadingScreen } from '../src/components/ThemedComponents';
+import { useAuth } from '../context/AuthContext';
 
-export default function WelcomeScreen() {
+export default function LoginScreen() {
   const router = useRouter();
-  const { currentUser, isLoading, login, loadStoredUser } = useUserStore();
+  const { login, register } = useAuth();
+
+  const [isLogin, setIsLogin] = useState(true);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [password, setPassword] = useState('');
+  const [phone, setPhone] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    loadStoredUser();
-  }, []);
-
-  useEffect(() => {
-    if (currentUser) {
-      router.replace('/(tabs)');
-    }
-  }, [currentUser]);
-
-  const handleJoin = async () => {
-    if (!name.trim() || !email.trim()) {
-      Alert.alert('Missing Information', 'Please enter your name and email.');
+  async function handleSubmit() {
+    if (!email || !password) {
+      Alert.alert('Error', 'Please enter email and password');
       return;
     }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      Alert.alert('Invalid Email', 'Please enter a valid email address.');
+    if (!isLogin && !name) {
+      Alert.alert('Error', 'Please enter your name');
       return;
     }
-
-    setIsSubmitting(true);
+    if (password.length < 6) {
+      Alert.alert('Error', 'Password must be at least 6 characters');
+      return;
+    }
+    setLoading(true);
     try {
-      await login(email.toLowerCase().trim(), name.trim());
+      if (isLogin) {
+        await login(email.trim().toLowerCase(), password);
+      } else {
+        await register(name.trim(), email.trim().toLowerCase(), password, phone);
+      }
       router.replace('/(tabs)');
     } catch (error: any) {
-      Alert.alert('Error', error.message || 'Failed to join. Please try again.');
+      Alert.alert('Error', error.message || 'Something went wrong. Please try again.');
     } finally {
-      setIsSubmitting(false);
+      setLoading(false);
     }
-  };
-
-  if (isLoading) {
-    return <LoadingScreen />;
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.keyboardView}
-      >
-        <ScrollView
-          contentContainerStyle={styles.scrollContent}
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
-        >
-          <View style={styles.logoContainer}>
-            <Image
-              source={require('../assets/images/logo.jpg')}
-              style={styles.logo}
-              resizeMode="contain"
-            />
+    <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+      <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
+        <View style={styles.header}>
+          <View style={styles.logoCircle}>
+            <Text style={styles.logoText}>✝</Text>
           </View>
+          <Text style={styles.appName}>Kingdom Citizens</Text>
+          <Text style={styles.tagline}>Together in Faith</Text>
+        </View>
 
-          <View style={styles.welcomeContainer}>
-            <Text style={styles.welcomeTitle}>Welcome to</Text>
-            <Text style={styles.appName}>Kingdom Citizens</Text>
-            <Text style={styles.subtitle}>Bible Studies Team</Text>
-          </View>
+        <View style={styles.tabRow}>
+          <TouchableOpacity style={[styles.tab, isLogin && styles.tabActive]} onPress={() => setIsLogin(true)}>
+            <Text style={[styles.tabText, isLogin && styles.tabTextActive]}>Sign In</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={[styles.tab, !isLogin && styles.tabActive]} onPress={() => setIsLogin(false)}>
+            <Text style={[styles.tabText, !isLogin && styles.tabTextActive]}>Register</Text>
+          </TouchableOpacity>
+        </View>
 
-          <View style={styles.formContainer}>
-            <Text style={styles.formTitle}>Join Our Community</Text>
-
-            <Input
-              value={name}
-              onChangeText={setName}
-              placeholder="Your Name"
-              icon="person-outline"
-              label="Name"
-            />
-
-            <Input
-              value={email}
-              onChangeText={setEmail}
-              placeholder="your.email@example.com"
-              keyboardType="email-address"
-              icon="mail-outline"
-              label="Email"
-            />
-
-            <Button
-              title="Join Community"
-              onPress={handleJoin}
-              loading={isSubmitting}
-              icon="enter-outline"
-              style={styles.joinButton}
-            />
-          </View>
-
-          <Text style={styles.footerText}>
-            "For where two or three gather in my name, there am I with them."
-          </Text>
-          <Text style={styles.verseRef}>- Matthew 18:20</Text>
-        </ScrollView>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+        <View style={styles.form}>
+          {!isLogin && (
+            <TextInput style={styles.input} placeholder="Full Name" placeholderTextColor="#888"
+              value={name} onChangeText={setName} autoCapitalize="words" />
+          )}
+          <TextInput style={styles.input} placeholder="Email Address" placeholderTextColor="#888"
+            value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" />
+          <TextInput style={styles.input} placeholder="Password (min 6 characters)" placeholderTextColor="#888"
+            value={password} onChangeText={setPassword} secureTextEntry />
+          {!isLogin && (
+            <TextInput style={styles.input} placeholder="Phone Number (optional)" placeholderTextColor="#888"
+              value={phone} onChangeText={setPhone} keyboardType="phone-pad" />
+          )}
+          <TouchableOpacity style={styles.button} onPress={handleSubmit} disabled={loading}>
+            {loading ? <ActivityIndicator color="#fff" /> : (
+              <Text style={styles.buttonText}>{isLogin ? 'Sign In' : 'Create Account'}</Text>
+            )}
+          </TouchableOpacity>
+          {!isLogin && (
+            <Text style={styles.note}>💡 The first person to register becomes the Admin.</Text>
+          )}
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  keyboardView: {
-    flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
-    padding: 24,
-    justifyContent: 'center',
-  },
-  logoContainer: {
-    alignItems: 'center',
-    marginBottom: 24,
-  },
-  logo: {
-    width: 180,
-    height: 180,
-    borderRadius: 90,
-  },
-  welcomeContainer: {
-    alignItems: 'center',
-    marginBottom: 32,
-  },
-  welcomeTitle: {
-    fontSize: 18,
-    color: colors.textSecondary,
-  },
-  appName: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: colors.primary,
-    marginTop: 4,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: colors.text,
-    marginTop: 4,
-  },
-  formContainer: {
-    backgroundColor: colors.surface,
-    borderRadius: 20,
-    padding: 24,
-    marginBottom: 32,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  formTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: colors.text,
-    textAlign: 'center',
-    marginBottom: 24,
-  },
-  joinButton: {
-    marginTop: 8,
-  },
-  footerText: {
-    fontSize: 14,
-    color: colors.textSecondary,
-    textAlign: 'center',
-    fontStyle: 'italic',
-  },
-  verseRef: {
-    fontSize: 12,
-    color: colors.primary,
-    textAlign: 'center',
-    marginTop: 4,
-  },
+  container: { flex: 1, backgroundColor: '#0f172a' },
+  scroll: { flexGrow: 1, justifyContent: 'center', padding: 24 },
+  header: { alignItems: 'center', marginBottom: 40 },
+  logoCircle: { width: 80, height: 80, borderRadius: 40, backgroundColor: '#7c3aed', justifyContent: 'center', alignItems: 'center', marginBottom: 16 },
+  logoText: { fontSize: 36, color: '#fff' },
+  appName: { fontSize: 28, fontWeight: 'bold', color: '#fff', marginBottom: 4 },
+  tagline: { fontSize: 14, color: '#94a3b8' },
+  tabRow: { flexDirection: 'row', backgroundColor: '#1e293b', borderRadius: 12, padding: 4, marginBottom: 24 },
+  tab: { flex: 1, paddingVertical: 10, alignItems: 'center', borderRadius: 10 },
+  tabActive: { backgroundColor: '#7c3aed' },
+  tabText: { color: '#94a3b8', fontWeight: '600' },
+  tabTextActive: { color: '#fff' },
+  form: { gap: 12 },
+  input: { backgroundColor: '#1e293b', borderRadius: 12, padding: 16, color: '#fff', fontSize: 16, borderWidth: 1, borderColor: '#334155' },
+  button: { backgroundColor: '#7c3aed', borderRadius: 12, padding: 16, alignItems: 'center', marginTop: 8 },
+  buttonText: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
+  note: { color: '#64748b', fontSize: 12, textAlign: 'center', marginTop: 8 },
 });
