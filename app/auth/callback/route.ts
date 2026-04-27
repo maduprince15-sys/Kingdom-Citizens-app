@@ -24,7 +24,7 @@ export async function GET(request: Request) {
           id: user.id,
           email: user.email,
           full_name: user.user_metadata?.full_name || 'New Member',
-          phone: user.user_metadata?.phone || null,
+          phone: user.user_metadata?.phone_number || user.user_metadata?.phone || null,
           role: 'member',
         })
       }
@@ -35,3 +35,4 @@ export async function GET(request: Request) {
 
   return NextResponse.redirect(new URL('/login', origin))
 }
+

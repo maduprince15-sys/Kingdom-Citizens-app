@@ -40,7 +40,7 @@ export default function RegisterPage() {
         emailRedirectTo: `${getURL()}auth/callback`,
         data: {
           full_name: fullName,
-          phone: phone,
+          phone_number: phone,
         },
       },
     })
@@ -112,3 +112,4 @@ export default function RegisterPage() {
     </main>
   )
 }
+
