@@ -5,14 +5,17 @@ import { FormEvent, useState } from 'react'
 import { createClient } from '../../lib/supabase/client'
 
 const getURL = () => {
-  let url =
-    process.env.NEXT_PUBLIC_SITE_URL ??
-    process.env.NEXT_PUBLIC_VERCEL_URL ??
-    'http://localhost:3000/'
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL
 
-  url = url.startsWith('http') ? url : `https://${url}`
-  url = url.endsWith('/') ? url : `${url}/`
-  return url
+  if (siteUrl) {
+    return siteUrl.endsWith('/') ? siteUrl : `${siteUrl}/`
+  }
+
+  if (typeof window !== 'undefined') {
+    return `${window.location.origin}/`
+  }
+
+  return 'http://localhost:3000/'
 }
 
 export default function ForgotPasswordPage() {
