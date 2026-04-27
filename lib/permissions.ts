@@ -11,11 +11,11 @@ export function canDeleteUsers(role: string | null | undefined) {
   return role === 'owner'
 }
 
-export function canPostTeachings(role: string | null | undefined) {
-  return role === 'owner' || role === 'teacher'
+export function canPostAnnouncements(role: string | null | undefined) {
+  return role === 'owner' || role === 'teacher' || role === 'moderator'
 }
 
-export function canPostAnnouncements(role: string | null | undefined) {
+export function canCreatePosts(role: string | null | undefined) {
   return role === 'owner' || role === 'teacher' || role === 'moderator'
 }
 

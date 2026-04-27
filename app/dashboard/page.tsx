@@ -26,6 +26,8 @@ export default async function DashboardPage() {
         <Link href='/books' className='rounded bg-green-600 px-4 py-2 text-white'>Books</Link>
         <Link href='/connect' className='rounded bg-purple-600 px-4 py-2 text-white'>Connect</Link>
         <Link href='/meetings' className='rounded bg-yellow-600 px-4 py-2 text-white'>Meetings</Link>
+        <Link href='/announcements' className='rounded bg-cyan-600 px-4 py-2 text-white'>Announcements</Link>
+        <Link href='/posts' className='rounded bg-pink-600 px-4 py-2 text-white'>Posts</Link>
       </div>
 
       <div className='mt-6 flex flex-wrap gap-4'>
