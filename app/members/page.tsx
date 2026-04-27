@@ -1,6 +1,8 @@
 ﻿import { redirect } from 'next/navigation'
 import { createClient } from '../../lib/supabase/server'
+import { canDeleteUsers, canManageRoles } from '../../lib/permissions'
 import DeleteUserButton from './DeleteUserButton'
+import RoleSelect from './RoleSelect'
 
 export default async function MembersPage() {
   const supabase = await createClient()
@@ -20,7 +22,9 @@ export default async function MembersPage() {
     .eq('id', user.id)
     .single()
 
-  const isAdmin = currentProfile?.role === 'admin'
+  const actorRole = currentProfile?.role ?? 'member'
+  const showRoleControls = canManageRoles(actorRole)
+  const showDeleteControls = canDeleteUsers(actorRole)
 
   const { data: members, error } = await supabase
     .from('profiles')
@@ -48,7 +52,7 @@ export default async function MembersPage() {
               <th className='border border-gray-700 px-4 py-2 text-left'>Email</th>
               <th className='border border-gray-700 px-4 py-2 text-left'>Phone</th>
               <th className='border border-gray-700 px-4 py-2 text-left'>Role</th>
-              {isAdmin && (
+              {(showRoleControls || showDeleteControls) && (
                 <th className='border border-gray-700 px-4 py-2 text-left'>Actions</th>
               )}
             </tr>
@@ -59,13 +63,30 @@ export default async function MembersPage() {
                 <td className='border border-gray-700 px-4 py-2'>{member.full_name || 'No name yet'}</td>
                 <td className='border border-gray-700 px-4 py-2'>{member.email}</td>
                 <td className='border border-gray-700 px-4 py-2'>{member.phone || '-'}</td>
-                <td className='border border-gray-700 px-4 py-2'>{member.role}</td>
-                {isAdmin && (
+                <td className='border border-gray-700 px-4 py-2'>
+                  {showRoleControls && member.id !== user.id ? (
+                    <RoleSelect
+                      userId={member.id}
+                      email={member.email}
+                      currentRole={member.role}
+                      actorRole={actorRole}
+                    />
+                  ) : (
+                    member.role
+                  )}
+                </td>
+                {(showRoleControls || showDeleteControls) && (
                   <td className='border border-gray-700 px-4 py-2'>
                     {member.id === user.id ? (
                       <span className='text-sm text-gray-400'>Use dashboard delete</span>
+                    ) : showDeleteControls ? (
+                      member.role === 'owner' ? (
+                        <span className='text-sm text-gray-400'>Protected owner</span>
+                      ) : (
+                        <DeleteUserButton userId={member.id} email={member.email} />
+                      )
                     ) : (
-                      <DeleteUserButton userId={member.id} email={member.email} />
+                      <span className='text-sm text-gray-400'>Role management only</span>
                     )}
                   </td>
                 )}
