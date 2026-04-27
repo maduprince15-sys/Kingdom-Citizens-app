@@ -40,7 +40,7 @@ export async function POST(request: Request) {
 
   try {
     const admin = createAdminClient()
-    const { error } = await admin.auth.admin.deleteUser(targetUserId, true)
+    const { error } = await admin.auth.admin.deleteUser(targetUserId, false)
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 400 })
@@ -52,3 +52,4 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: message }, { status: 500 })
   }
 }
+
