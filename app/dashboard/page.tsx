@@ -31,79 +31,87 @@ const { count: unreadCount } = await supabase
   .is('read_at', null)
   .is('recipient_archived_at', null)
 
-  const cards = [
- {
-  title: 'Profile',
-  description: 'Update your full name, phone number, and member information.',
-  href: '/profile',
-  label: 'Member profile',
- },
-{
-  title: `Messages${unreadCount ? ` (${unreadCount} unread)` : ''}`,
-  description: 'Read inbox messages and send messages to board members.',
-  href: '/messages',
-  label: 'Inbox',
-},    {
-      title: 'Members',
-      description: 'View members, roles, and membership information.',
-      href: '/members',
-      label: 'Manage community',
-    },
-    {
-      title: 'Books',
-      description: 'Access The Kingdom Citizens book and teaching resource area.',
-      href: '/books',
-      label: 'Bookstore',
-    },
-{
-  title: 'Manage Books',
-  description: 'Add, edit, hide, or update bookstore resources.',
-  href: '/admin/books',
-  label: 'Admin books',
-},
-    {
-      title: 'Connect',
-      description: 'Manage or access official ministry links and channels.',
-      href: '/connect',
-      label: 'Media links',
-    },
-{
-  title: 'Manage Connect',
-  description: 'Add, edit, hide, or remove official ministry links.',
-  href: '/admin/connect',
-  label: 'Admin links',
-},
-    {
-      title: 'Meetings',
-      description: 'Access meeting links, fellowship gatherings, and live sessions.',
-      href: '/meetings',
-      label: 'Join live',
-    },
-{
-  title: 'Manage Meetings',
-  description: 'Add, edit, or remove live meeting links and schedules.',
-  href: '/admin/meetings',
-  label: 'Admin meetings',
-},
-{
-  title: 'Prayer Wall',
-  description: 'Share prayer requests and stand with members in prayer.',
-  href: '/prayers',
-  label: 'Prayer',
-},
-    {
-      title: 'Announcements',
-      description: 'Create, read, edit, pin, and manage official announcements.',
-      href: '/announcements',
-      label: 'Official notices',
-    },
-    {
-      title: 'Posts',
-      description: 'Create, read, edit, and manage teaching or community posts.',
-      href: '/posts',
-      label: 'Teaching posts',
-    },
-  ]
+  const memberCards = [
+  {
+    title: 'Profile',
+    description: 'Update your full name, phone number, and member information.',
+    href: '/profile',
+    label: 'Member profile',
+  },
+  {
+    title: `Messages${unreadCount ? ` (${unreadCount} unread)` : ''}`,
+    description: 'Read inbox messages and send messages to board members.',
+    href: '/messages',
+    label: 'Inbox',
+  },
+  {
+    title: 'Books',
+    description: 'Access The Kingdom Citizens book and teaching resource area.',
+    href: '/books',
+    label: 'Bookstore',
+  },
+  {
+    title: 'Connect',
+    description: 'Access official ministry links and channels.',
+    href: '/connect',
+    label: 'Media links',
+  },
+  {
+    title: 'Meetings',
+    description: 'Access meeting links, fellowship gatherings, and live sessions.',
+    href: '/meetings',
+    label: 'Join live',
+  },
+  {
+    title: 'Announcements',
+    description: 'Read official announcements and ministry updates.',
+    href: '/announcements',
+    label: 'Official notices',
+  },
+  {
+    title: 'Posts',
+    description: 'Read and engage with teaching or community posts.',
+    href: '/posts',
+    label: 'Teaching posts',
+  },
+  {
+    title: 'Prayer Wall',
+    description: 'Share prayer requests and stand with members in prayer.',
+    href: '/prayers',
+    label: 'Prayer',
+  },
+]
+
+const adminCards = [
+  {
+    title: 'Members',
+    description: 'View members, roles, and membership information.',
+    href: '/members',
+    label: 'Manage community',
+  },
+  {
+    title: 'Manage Books',
+    description: 'Add, edit, hide, or update bookstore resources.',
+    href: '/admin/books',
+    label: 'Admin books',
+  },
+  {
+    title: 'Manage Connect',
+    description: 'Add, edit, hide, or remove official ministry links.',
+    href: '/admin/connect',
+    label: 'Admin links',
+  },
+  {
+    title: 'Manage Meetings',
+    description: 'Add, edit, or remove live meeting links and schedules.',
+    href: '/admin/meetings',
+    label: 'Admin meetings',
+  },
+]
+
+const cards = ['owner', 'admin'].includes(role)
+  ? [...memberCards, ...adminCards]
+  : memberCards
 
   return (
     <main className='min-h-screen bg-[#050303] text-white'>
