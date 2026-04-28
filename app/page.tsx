@@ -1,10 +1,12 @@
+import PublicHeader from './components/PublicHeader'
 import Link from 'next/link'
 
 const LOGO_SRC = '/logo.png'
 
 export default function HomePage() {
   return (
-    <main className="min-h-screen bg-[#140707] text-white">
+   <main className='min-h-screen bg-[#050303] pb-20 text-white md:pb-0'>
+<PublicHeader />
       {/* HERO */}
       <section className="relative overflow-hidden bg-[linear-gradient(180deg,#5a0716_0%,#2a0610_28%,#1a0b09_55%,#140707_100%)]">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,215,120,0.22),transparent_28%),radial-gradient(circle_at_top_right,rgba(255,255,255,0.08),transparent_22%),radial-gradient(circle_at_center,rgba(145,15,44,0.25),transparent_45%)]" />
