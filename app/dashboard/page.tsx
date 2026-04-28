@@ -67,12 +67,24 @@ const { count: unreadCount } = await supabase
       href: '/connect',
       label: 'Media links',
     },
+{
+  title: 'Manage Connect',
+  description: 'Add, edit, hide, or remove official ministry links.',
+  href: '/admin/connect',
+  label: 'Admin links',
+},
     {
       title: 'Meetings',
       description: 'Access meeting links, fellowship gatherings, and live sessions.',
       href: '/meetings',
       label: 'Join live',
     },
+{
+  title: 'Manage Meetings',
+  description: 'Add, edit, or remove live meeting links and schedules.',
+  href: '/admin/meetings',
+  label: 'Admin meetings',
+},
     {
       title: 'Announcements',
       description: 'Create, read, edit, pin, and manage official announcements.',
