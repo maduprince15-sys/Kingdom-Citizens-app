@@ -12,13 +12,21 @@ type Profile = {
 
 type Props = {
   recipients: Profile[]
+  defaultRecipientId?: string
+  defaultSubject?: string
+  parentMessageId?: string
 }
 
-export default function MessageForm({ recipients }: Props) {
+export default function MessageForm({
+  recipients,
+  defaultRecipientId = 'all',
+  defaultSubject = '',
+  parentMessageId,
+}: Props) {
   const router = useRouter()
 
-  const [recipientId, setRecipientId] = useState('all')
-  const [subject, setSubject] = useState('')
+  const [recipientId, setRecipientId] = useState(defaultRecipientId)
+  const [subject, setSubject] = useState(defaultSubject)
   const [body, setBody] = useState('')
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
@@ -31,7 +39,12 @@ export default function MessageForm({ recipients }: Props) {
     const response = await fetch('/api/messages/send', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ recipientId, subject, body }),
+      body: JSON.stringify({
+        recipientId,
+        subject,
+        body,
+        parentMessageId: parentMessageId || null,
+      }),
     })
 
     const result = await response.json()
@@ -42,7 +55,12 @@ export default function MessageForm({ recipients }: Props) {
       return
     }
 
-    setMessage('Message sent successfully.')
+    setMessage(
+      recipientId === 'all'
+        ? 'Broadcast sent successfully.'
+        : 'Message sent successfully.'
+    )
+
     setLoading(false)
 
     setTimeout(() => {
@@ -60,13 +78,20 @@ export default function MessageForm({ recipients }: Props) {
           onChange={(e) => setRecipientId(e.target.value)}
           className='w-full rounded border border-gray-300 bg-white p-3 text-black'
         >
-          <option value='all'>All members</option>
+          <option value='all'>Broadcast to all members</option>
+
           {recipients.map((profile) => (
             <option key={profile.id} value={profile.id}>
               {(profile.full_name || profile.email || 'Member') + ` (${profile.role || 'member'})`}
             </option>
           ))}
         </select>
+
+        {recipientId === 'all' && (
+          <p className='mt-2 text-sm text-yellow-300'>
+            This will send the message to every member except you.
+          </p>
+        )}
       </div>
 
       <div>
@@ -97,7 +122,11 @@ export default function MessageForm({ recipients }: Props) {
         disabled={loading}
         className='rounded-full bg-yellow-500 px-5 py-3 text-sm font-bold text-black hover:bg-yellow-400 disabled:opacity-50'
       >
-        {loading ? 'Sending...' : 'Send Message'}
+        {loading
+          ? 'Sending...'
+          : recipientId === 'all'
+            ? 'Send Broadcast'
+            : 'Send Message'}
       </button>
 
       {message && <p className='text-sm text-yellow-300'>{message}</p>}

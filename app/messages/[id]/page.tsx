@@ -19,9 +19,18 @@ export default async function MessageDetailPage({ params }: Props) {
     redirect('/login')
   }
 
+  const { data: currentProfile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single()
+
+  const role = currentProfile?.role ?? 'member'
+  const canReply = role === 'owner' || role === 'admin'
+
   const { data: message, error } = await supabase
     .from('app_messages')
-    .select('id, subject, body, read_at, created_at, sender_id, recipient_id')
+    .select('id, subject, body, read_at, created_at, sender_id, sender_name, recipient_id')
     .eq('id', id)
     .single()
 
@@ -46,6 +55,10 @@ export default async function MessageDetailPage({ params }: Props) {
       .eq('recipient_id', user.id)
   }
 
+  const replySubject = message.subject.startsWith('Re:')
+    ? message.subject
+    : `Re: ${message.subject}`
+
   return (
     <main className='min-h-screen bg-[#050303] text-white'>
       <section className='border-b border-yellow-900/40 bg-gradient-to-br from-black via-[#130606] to-[#260909] px-4 py-8 md:px-8'>
@@ -66,6 +79,15 @@ export default async function MessageDetailPage({ params }: Props) {
 
       <section className='mx-auto max-w-4xl px-4 py-8 md:px-8'>
         <article className='rounded-2xl border border-yellow-900/40 bg-[#120707] p-5 md:p-7'>
+          <div className='mb-5 rounded-xl border border-yellow-900/30 bg-black/30 p-4'>
+            <p className='text-xs uppercase tracking-[0.25em] text-yellow-500'>
+              From
+            </p>
+            <p className='mt-2 text-gray-200'>
+              {message.sender_name || 'The Kingdom Citizens'}
+            </p>
+          </div>
+
           <h2 className='text-2xl font-bold md:text-4xl'>{message.subject}</h2>
 
           <div className='mt-6 whitespace-pre-wrap text-base leading-8 text-gray-200'>
@@ -73,9 +95,20 @@ export default async function MessageDetailPage({ params }: Props) {
           </div>
         </article>
 
-        <Link href='/messages' className='mt-6 inline-block text-yellow-300 underline'>
-          Back to Messages
-        </Link>
+        <div className='mt-6 flex flex-wrap gap-3'>
+          <Link href='/messages' className='rounded-full border border-yellow-700/70 px-4 py-2 text-sm text-yellow-300 hover:bg-yellow-700/20'>
+            Back to Messages
+          </Link>
+
+          {canReply && (
+            <Link
+              href={`/messages/new?recipient=${message.sender_id}&subject=${encodeURIComponent(replySubject)}&parent=${message.id}`}
+              className='rounded-full bg-yellow-500 px-4 py-2 text-sm font-bold text-black hover:bg-yellow-400'
+            >
+              Reply
+            </Link>
+          )}
+        </div>
       </section>
     </main>
   )

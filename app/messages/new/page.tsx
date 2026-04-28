@@ -3,7 +3,16 @@ import { redirect } from 'next/navigation'
 import { createClient } from '../../../lib/supabase/server'
 import MessageForm from './MessageForm'
 
-export default async function NewMessagePage() {
+type Props = {
+  searchParams: Promise<{
+    recipient?: string
+    subject?: string
+    parent?: string
+  }>
+}
+
+export default async function NewMessagePage({ searchParams }: Props) {
+  const params = await searchParams
   const supabase = await createClient()
 
   const {
@@ -44,6 +53,10 @@ export default async function NewMessagePage() {
     .select('id, full_name, email, role')
     .order('created_at', { ascending: false })
 
+  const defaultSubject = params.subject
+    ? decodeURIComponent(params.subject)
+    : ''
+
   return (
     <main className='min-h-screen bg-[#050303] text-white'>
       <section className='border-b border-yellow-900/40 bg-gradient-to-br from-black via-[#130606] to-[#260909] px-4 py-8 md:px-8'>
@@ -57,14 +70,19 @@ export default async function NewMessagePage() {
           </h1>
 
           <p className='mt-3 max-w-2xl text-sm leading-6 text-gray-300'>
-            Send a message to one member or broadcast to all members.
+            Send a direct message to one member or broadcast to all members.
           </p>
         </div>
       </section>
 
       <section className='mx-auto max-w-4xl px-4 py-8 md:px-8'>
         <div className='rounded-2xl border border-yellow-900/40 bg-[#120707] p-5 md:p-7'>
-          <MessageForm recipients={recipients || []} />
+          <MessageForm
+            recipients={recipients || []}
+            defaultRecipientId={params.recipient || 'all'}
+            defaultSubject={defaultSubject}
+            parentMessageId={params.parent}
+          />
         </div>
 
         <Link href='/messages' className='mt-6 inline-block text-yellow-300 underline'>

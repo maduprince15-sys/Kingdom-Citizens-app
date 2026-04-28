@@ -15,12 +15,12 @@ export async function POST(request: Request) {
 
   const { data: profile, error: profileError } = await supabase
     .from('profiles')
-    .select('role')
+    .select('role, full_name, email')
     .eq('id', user.id)
     .single()
 
   if (profileError || !profile) {
-    return NextResponse.json({ error: 'Could not load role.' }, { status: 400 })
+    return NextResponse.json({ error: 'Could not load sender profile.' }, { status: 400 })
   }
 
   if (!['owner', 'admin'].includes(profile.role)) {
@@ -31,6 +31,7 @@ export async function POST(request: Request) {
   const recipientId = bodyData?.recipientId
   const subject = String(bodyData?.subject || '').trim()
   const body = String(bodyData?.body || '').trim()
+  const parentMessageId = bodyData?.parentMessageId || null
 
   if (!subject || !body) {
     return NextResponse.json({ error: 'Subject and message are required.' }, { status: 400 })
@@ -39,6 +40,8 @@ export async function POST(request: Request) {
   if (!recipientId) {
     return NextResponse.json({ error: 'Recipient is required.' }, { status: 400 })
   }
+
+  const senderName = profile.full_name || profile.email || user.email || 'The Kingdom Citizens'
 
   if (recipientId === 'all') {
     const { data: recipients, error: recipientsError } = await supabase
@@ -53,9 +56,11 @@ export async function POST(request: Request) {
     const rows =
       recipients?.map((recipient) => ({
         sender_id: user.id,
+        sender_name: senderName,
         recipient_id: recipient.id,
         subject,
         body,
+        parent_message_id: parentMessageId,
       })) || []
 
     if (rows.length === 0) {
@@ -75,9 +80,11 @@ export async function POST(request: Request) {
 
   const { error: insertError } = await supabase.from('app_messages').insert({
     sender_id: user.id,
+    sender_name: senderName,
     recipient_id: recipientId,
     subject,
     body,
+    parent_message_id: parentMessageId,
   })
 
   if (insertError) {
