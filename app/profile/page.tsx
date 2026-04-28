@@ -14,6 +14,13 @@ export default async function ProfilePage() {
     redirect('/login')
   }
 
+  if (user.email) {
+    await supabase
+      .from('profiles')
+      .update({ email: user.email })
+      .eq('id', user.id)
+  }
+
   const { data: profile, error } = await supabase
     .from('profiles')
     .select('full_name, email, phone, role')
@@ -44,8 +51,8 @@ export default async function ProfilePage() {
           </h1>
 
           <p className='mt-3 max-w-2xl text-sm leading-6 text-gray-300 md:text-base'>
-            Update your member information. Your email is used for login and confirmation;
-            your phone number is only displayed in your member profile.
+            Update your member information, phone number, and account email.
+            Email changes require confirmation through your new email address.
           </p>
         </div>
       </section>
@@ -55,7 +62,7 @@ export default async function ProfilePage() {
           <ProfileForm
             initialFullName={profile?.full_name || ''}
             initialPhone={profile?.phone || ''}
-            email={profile?.email || user.email || ''}
+            email={user.email || profile?.email || ''}
             role={profile?.role || 'member'}
           />
         </div>
