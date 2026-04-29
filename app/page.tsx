@@ -12,6 +12,14 @@ export default async function HomePage() {
     .order('meeting_date', { ascending: true })
     .limit(3)
 
+  const { data: pinnedAnnouncement } = await supabase
+    .from('app_announcements')
+    .select('id, title, content, image_url, video_url, created_at')
+    .eq('is_pinned', true)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+
   return (
     <main className='min-h-screen bg-[#050303] pb-20 text-white md:pb-0'>
       <PublicHeader />
@@ -111,46 +119,101 @@ export default async function HomePage() {
                   <p className='text-xs uppercase tracking-[0.3em] text-yellow-400'>
                     The Kingdom Citizens
                   </p>
-                  <h2 className='mt-1 text-2xl font-bold'>Today</h2>
+
+                  <h2 className='mt-1 text-2xl font-bold'>
+                    {pinnedAnnouncement ? 'Pinned Notice' : 'Today'}
+                  </h2>
                 </div>
               </div>
 
-              <div className='mt-6 rounded-2xl bg-[#7c2630] p-5'>
-                <p className='text-xs uppercase tracking-[0.25em] text-yellow-200'>
-                  Welcome
-                </p>
-                <p className='mt-3 text-lg font-bold'>
-                  Growing together in Christ and in the Word.
-                </p>
-              </div>
+              {pinnedAnnouncement ? (
+                <>
+                  {pinnedAnnouncement.image_url && (
+                    <img
+                      src={pinnedAnnouncement.image_url}
+                      alt={pinnedAnnouncement.title}
+                      className='mt-6 max-h-72 w-full rounded-2xl object-cover'
+                    />
+                  )}
 
-              <div className='mt-5 grid grid-cols-2 gap-4'>
-                <div className='rounded-2xl bg-white/90 p-4 text-black'>
-                  <p className='text-xs text-gray-500'>Schedule</p>
-                  <p className='mt-2 font-bold'>
-                    {meetings?.[0]?.title || 'Thursday'}
-                  </p>
-                  <p className='text-sm'>
-                    {meetings?.[0]?.meeting_time || 'Bible Study · 8:00 PM'}
-                  </p>
-                </div>
+                  <div className='mt-6 rounded-2xl bg-[#7c2630] p-5'>
+                    <p className='text-xs uppercase tracking-[0.25em] text-yellow-200'>
+                      Announcement
+                    </p>
 
-                <div className='rounded-2xl bg-white/90 p-4 text-black'>
-                  <p className='text-xs text-gray-500'>Prayer</p>
-                  <p className='mt-2 font-bold'>Stand Together</p>
-                  <p className='text-sm'>Prayer Wall</p>
-                </div>
-              </div>
+                    <h3 className='mt-3 text-2xl font-black'>
+                      {pinnedAnnouncement.title}
+                    </h3>
+                  </div>
 
-              <div className='mt-5 rounded-2xl border border-yellow-900/40 bg-black/40 p-4'>
-                <p className='text-xs uppercase tracking-[0.25em] text-yellow-400'>
-                  Meditation Scripture
-                </p>
-                <p className='mt-3 text-sm leading-6 text-gray-300'>
-                  “He humbled you, caused you to hunger, and fed you with manna...”
-                </p>
-                <p className='mt-2 text-xs text-gray-500'>Deuteronomy 8:3</p>
-              </div>
+                  <div className='mt-5 rounded-2xl border border-yellow-900/40 bg-black/40 p-4'>
+                    <p className='text-xs uppercase tracking-[0.25em] text-yellow-400'>
+                      Pinned Message
+                    </p>
+
+                    <p className='mt-3 whitespace-pre-wrap text-sm leading-6 text-gray-300'>
+                      {pinnedAnnouncement.content}
+                    </p>
+
+                    {pinnedAnnouncement.video_url && (
+                      <a
+                        href={pinnedAnnouncement.video_url}
+                        target='_blank'
+                        rel='noopener noreferrer'
+                        className='mt-4 inline-block rounded-full border border-yellow-700 px-4 py-2 text-sm font-bold text-yellow-300 hover:bg-yellow-900/20'
+                      >
+                        Open Video
+                      </a>
+                    )}
+
+                    <Link
+                      href='/public/announcements'
+                      className='mt-4 inline-block rounded-full bg-yellow-500 px-4 py-2 text-sm font-bold text-black hover:bg-yellow-400'
+                    >
+                      View All Announcements
+                    </Link>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className='mt-6 rounded-2xl bg-[#7c2630] p-5'>
+                    <p className='text-xs uppercase tracking-[0.25em] text-yellow-200'>
+                      Welcome
+                    </p>
+                    <p className='mt-3 text-lg font-bold'>
+                      Growing together in Christ and in the Word.
+                    </p>
+                  </div>
+
+                  <div className='mt-5 grid grid-cols-2 gap-4'>
+                    <div className='rounded-2xl bg-white/90 p-4 text-black'>
+                      <p className='text-xs text-gray-500'>Schedule</p>
+                      <p className='mt-2 font-bold'>
+                        {meetings?.[0]?.title || 'Thursday'}
+                      </p>
+                      <p className='text-sm'>
+                        {meetings?.[0]?.meeting_time || 'Bible Study · 8:00 PM'}
+                      </p>
+                    </div>
+
+                    <div className='rounded-2xl bg-white/90 p-4 text-black'>
+                      <p className='text-xs text-gray-500'>Prayer</p>
+                      <p className='mt-2 font-bold'>Stand Together</p>
+                      <p className='text-sm'>Prayer Wall</p>
+                    </div>
+                  </div>
+
+                  <div className='mt-5 rounded-2xl border border-yellow-900/40 bg-black/40 p-4'>
+                    <p className='text-xs uppercase tracking-[0.25em] text-yellow-400'>
+                      Meditation Scripture
+                    </p>
+                    <p className='mt-3 text-sm leading-6 text-gray-300'>
+                      “He humbled you, caused you to hunger, and fed you with manna...”
+                    </p>
+                    <p className='mt-2 text-xs text-gray-500'>Deuteronomy 8:3</p>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </div>
