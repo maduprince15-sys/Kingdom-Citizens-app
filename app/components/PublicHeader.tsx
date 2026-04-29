@@ -51,6 +51,9 @@ export default function PublicHeader() {
                 Posts
               </Link>
 
+<Link href='/public/giving' className='rounded-lg p-3 hover:bg-yellow-900/20'>
+  Giving
+</Link>
               <Link href='/public/books' className='rounded-lg p-3 hover:bg-yellow-900/20'>
                 Books
               </Link>

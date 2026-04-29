@@ -11,6 +11,8 @@ export default function PublicFooter() {
           </p>
         </div>
 
+<Link href='/public/giving' className='hover:text-yellow-400'>Giving</Link>
+
         <div>
           <h3 className='font-semibold text-yellow-300'>Public Pages</h3>
           <div className='mt-3 flex flex-col gap-2 text-sm text-gray-400'>

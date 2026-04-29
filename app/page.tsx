@@ -46,6 +46,13 @@ export default async function HomePage() {
                 View Announcements
               </Link>
 
+<Link href='/public/giving' className='rounded-2xl border border-yellow-900/30 bg-gradient-to-br from-[#120707] to-black p-6 shadow-lg shadow-black/30 hover:border-yellow-600'>
+  <p className='text-xs uppercase tracking-[0.25em] text-yellow-500'>Giving</p>
+  <h3 className='mt-3 text-2xl font-bold'>Support</h3>
+  <p className='mt-3 text-sm leading-6 text-gray-300'>
+    Support The Kingdom Citizens work, teachings, meetings, and ministry outreach.
+  </p>
+</Link>
               <Link
                 href='/public/posts'
                 className='rounded-full border border-yellow-700/70 px-6 py-3 text-sm font-bold text-yellow-300 hover:bg-yellow-900/20'

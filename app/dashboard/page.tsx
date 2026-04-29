@@ -101,6 +101,12 @@ const adminCards = [
     href: '/admin/books',
     label: 'Admin books',
   },
+{
+  title: 'Manage Giving',
+  description: 'Add, edit, hide, or remove official giving options.',
+  href: '/admin/giving',
+  label: 'Admin giving',
+},
   {
     title: 'Manage Connect',
     description: 'Add, edit, hide, or remove official ministry links.',
