@@ -102,6 +102,12 @@ export default async function DashboardPage() {
       href: '/announcements',
       label: 'Admin notices',
     },
+{
+  title: 'Announcement Display',
+  description: 'Open a public display screen for pinned announcements.',
+  href: '/display/announcements',
+  label: 'Pinned display',
+},
     {
       title: 'Manage Posts',
       description: 'Create, edit, and remove teaching or community posts.',
@@ -147,6 +153,12 @@ export default async function DashboardPage() {
       href: '/announcements',
       label: 'Moderator notices',
     },
+{
+  title: 'Announcement Display',
+  description: 'Open a public display screen for pinned announcements.',
+  href: '/display/announcements',
+  label: 'Pinned display',
+},
     {
       title: 'Manage Posts',
       description: 'Create, edit, and remove teaching or community posts.',
@@ -174,6 +186,12 @@ export default async function DashboardPage() {
       href: '/announcements',
       label: 'Teacher notices',
     },
+{
+  title: 'Announcement Display',
+  description: 'Open a public display screen for pinned announcements.',
+  href: '/display/announcements',
+  label: 'Pinned display',
+},
     {
       title: 'Manage Posts',
       description: 'Create and manage teaching posts.',
