@@ -1,0 +1,25 @@
+{
+  "name": "The Kingdom Citizens",
+  "short_name": "Kingdom Citizens",
+  "description": "The Kingdom Citizens platform for teachings, meetings, prayer, books, posts, calendar, giving, and member community.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#050303",
+  "theme_color": "#120505",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/kingdom-citizens-logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/kingdom-citizens-logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
