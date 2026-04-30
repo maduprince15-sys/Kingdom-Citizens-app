@@ -179,6 +179,12 @@ export default async function DashboardPage() {
   href: '/study',
   label: 'Study',
 },
+{
+  title: 'My Study Progress',
+  description: 'Continue saved studies, review bookmarks, completed lessons, and private study notes.',
+  href: '/study/progress',
+  label: 'Study progress',
+},
     {
       title: 'Connect',
       description: 'Access official ministry links and channels.',

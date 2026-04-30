@@ -135,6 +135,27 @@ export default async function StudyCenterPage() {
           )}
         </div>
       </section>
+<div className='mb-8 rounded-[2rem] border border-yellow-700/50 bg-gradient-to-br from-[#120707] via-black to-[#2a0909] p-6 shadow-2xl shadow-black/40 md:p-8'>
+  <p className='text-xs uppercase tracking-[0.35em] text-yellow-400'>
+    Member Progress
+  </p>
+
+  <h2 className='mt-3 text-3xl font-black text-white md:text-5xl'>
+    My Study Progress
+  </h2>
+
+  <p className='mt-4 max-w-3xl text-sm leading-7 text-gray-300 md:text-base'>
+    Signed-in members can continue saved studies, review bookmarks, see completed lessons,
+    and revisit private notes.
+  </p>
+
+  <Link
+    href='/study/progress'
+    className='mt-6 inline-block rounded-full bg-yellow-500 px-6 py-3 text-sm font-black text-black hover:bg-yellow-400'
+  >
+    Open My Study Progress →
+  </Link>
+</div>
 
       <PublicFooter />
     </main>
