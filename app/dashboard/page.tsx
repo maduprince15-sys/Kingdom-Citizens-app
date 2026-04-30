@@ -227,6 +227,19 @@ export default async function DashboardPage() {
       href: '/admin/groups',
       label: 'Groups',
     },
+   {
+      title: 'Manage Citizen Records',
+      description: 'Add and manage member contribution, attendance, task, service, and training records.',
+      href: '/admin/member-records',
+      label: 'Records',
+    },
+
+{
+  title: 'Contact Messages',
+  description: 'Read and manage messages sent from the public contact box.',
+  href: '/admin/contact-messages',
+  label: 'Public messages',
+},
     {
       title: 'Manage Announcements',
       description: 'Create, edit, pin, unpin, and delete official announcements.',
@@ -262,12 +275,6 @@ export default async function DashboardPage() {
       description: 'Add, edit, hide, or remove official giving options.',
       href: '/admin/giving',
       label: 'Giving portal',
-    },
-    {
-      title: 'Manage Citizen Records',
-      description: 'Add and manage member contribution, attendance, task, service, and training records.',
-      href: '/admin/member-records',
-      label: 'Records',
     },
     {
       title: 'Manage Connect',
@@ -317,6 +324,12 @@ export default async function DashboardPage() {
       href: '/admin/member-records',
       label: 'Records',
     },
+{
+  title: 'Contact Messages',
+  description: 'Read and manage messages sent from the public contact box.',
+  href: '/admin/contact-messages',
+  label: 'Public messages',
+},
     {
       title: 'Manage Announcements',
       description: 'Create, edit, pin, unpin, and delete official announcements.',

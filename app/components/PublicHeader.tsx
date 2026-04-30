@@ -59,6 +59,9 @@ export default function PublicHeader() {
                 Books
               </Link>
 
+<Link href='/public/contact' className='rounded-lg p-3 hover:bg-yellow-900/20'>
+  Contact
+</Link>
               <Link href='/public/connect' className='rounded-lg p-3 hover:bg-yellow-900/20'>
                 Connect
               </Link>
