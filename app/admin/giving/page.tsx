@@ -23,9 +23,9 @@ export default async function AdminGivingPage() {
 
   const role = profile?.role ?? 'member'
 
-  if (!['owner', 'admin'].includes(role)) {
-    redirect('/dashboard')
-  }
+  if (!['admin', 'finance'].includes(role)) {
+  redirect('/dashboard')
+}
 
   const { data: options, error: optionsError } = await supabase
     .from('giving_options')

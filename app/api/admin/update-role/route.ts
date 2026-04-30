@@ -1,7 +1,10 @@
 ﻿import { NextResponse } from 'next/server'
 import { createClient as createRequestClient } from '../../../../lib/supabase/server'
 import { createAdminClient } from '../../../../lib/supabase/admin'
-import { ADMIN_ASSIGNABLE_ROLES, ALL_ROLES } from '../../../../lib/permissions'
+import {
+  ALL_ROLES,
+  getAssignableRoles,
+} from '../../../../lib/permissions'
 
 export async function POST(request: Request) {
   const supabase = await createRequestClient()
@@ -26,6 +29,7 @@ export async function POST(request: Request) {
   }
 
   const actorRole = actorProfile.role
+
   if (actorRole !== 'owner' && actorRole !== 'admin') {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
@@ -43,7 +47,10 @@ export async function POST(request: Request) {
   }
 
   if (targetUserId === user.id) {
-    return NextResponse.json({ error: 'You cannot change your own role here.' }, { status: 400 })
+    return NextResponse.json(
+      { error: 'You cannot change your own role here.' },
+      { status: 400 }
+    )
   }
 
   const { data: targetProfile, error: targetError } = await supabase
@@ -56,17 +63,46 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Target user not found.' }, { status: 404 })
   }
 
-  if (actorRole === 'admin') {
-    if (targetProfile.role === 'owner' || targetProfile.role === 'admin') {
+  if (targetProfile.role === 'owner') {
+    return NextResponse.json(
+      { error: 'Owner accounts are protected and cannot be changed here.' },
+      { status: 403 }
+    )
+  }
+
+  const assignableRoles = getAssignableRoles(actorRole)
+
+  if (!assignableRoles.includes(newRole)) {
+    return NextResponse.json(
+      { error: `Your role cannot assign ${newRole}.` },
+      { status: 403 }
+    )
+  }
+
+  if (actorRole === 'owner') {
+    const ownerCanChangeTarget =
+      targetProfile.role === 'admin' ||
+      targetProfile.role === 'member'
+
+    if (!ownerCanChangeTarget) {
       return NextResponse.json(
-        { error: 'Admins cannot change owners or other admins.' },
+        { error: 'Owners can only appoint members as admins or remove admins back to members.' },
+        { status: 403 }
+      )
+    }
+  }
+
+  if (actorRole === 'admin') {
+    if (targetProfile.role === 'admin') {
+      return NextResponse.json(
+        { error: 'Admins cannot change other admins.' },
         { status: 403 }
       )
     }
 
-    if (!ADMIN_ASSIGNABLE_ROLES.includes(newRole)) {
+    if (newRole === 'admin' || newRole === 'owner') {
       return NextResponse.json(
-        { error: 'Admins can only assign moderator, teacher, or member.' },
+        { error: 'Admins cannot assign admin or owner roles.' },
         { status: 403 }
       )
     }

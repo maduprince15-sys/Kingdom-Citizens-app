@@ -35,7 +35,7 @@ export default async function DashboardPage() {
   const memberCards = [
     {
       title: 'Profile',
-      description: 'Update your full name, phone number, email address, and member information.',
+      description: 'Update your full name, phone number, email address, birthday details, and member information.',
       href: '/profile',
       label: 'Member profile',
     },
@@ -89,31 +89,34 @@ export default async function DashboardPage() {
     },
   ]
 
+  const ownerCards = [
+    {
+      title: 'Members',
+      description: 'Govern admin appointments and remove admin privileges when needed.',
+      href: '/members',
+      label: 'Governance',
+    },
+  ]
+
   const adminCards = [
     {
       title: 'Members',
-      description: 'View members, roles, and membership information.',
+      description: 'View members and appoint lower offices such as finance, moderator, teacher, and member.',
       href: '/members',
       label: 'Manage community',
     },
-{
-  title: 'Manage Book Access',
-  description: 'Manually approve members to download private book PDFs.',
-  href: '/admin/book-access',
-  label: 'PDF access',
-},
     {
       title: 'Manage Announcements',
       description: 'Create, edit, pin, unpin, and delete official announcements.',
       href: '/announcements',
       label: 'Admin notices',
     },
-{
-  title: 'Announcement Display',
-  description: 'Open a public display screen for pinned announcements.',
-  href: '/display/announcements',
-  label: 'Pinned display',
-},
+    {
+      title: 'Announcement Display',
+      description: 'Open a public display screen for pinned announcements.',
+      href: '/display/announcements',
+      label: 'Pinned display',
+    },
     {
       title: 'Manage Posts',
       description: 'Create, edit, and remove teaching or community posts.',
@@ -127,10 +130,16 @@ export default async function DashboardPage() {
       label: 'Admin books',
     },
     {
+      title: 'Manage Book Access',
+      description: 'Manually approve members to download private book PDFs.',
+      href: '/admin/book-access',
+      label: 'PDF access',
+    },
+    {
       title: 'Manage Giving',
       description: 'Add, edit, hide, or remove official giving options.',
       href: '/admin/giving',
-      label: 'Admin giving',
+      label: 'Giving portal',
     },
     {
       title: 'Manage Connect',
@@ -152,6 +161,15 @@ export default async function DashboardPage() {
     },
   ]
 
+  const financeCards = [
+    {
+      title: 'Manage Giving',
+      description: 'Manage the Giving portal and future financial contribution records.',
+      href: '/admin/giving',
+      label: 'Finance office',
+    },
+  ]
+
   const moderatorCards = [
     {
       title: 'Manage Announcements',
@@ -159,12 +177,12 @@ export default async function DashboardPage() {
       href: '/announcements',
       label: 'Moderator notices',
     },
-{
-  title: 'Announcement Display',
-  description: 'Open a public display screen for pinned announcements.',
-  href: '/display/announcements',
-  label: 'Pinned display',
-},
+    {
+      title: 'Announcement Display',
+      description: 'Open a public display screen for pinned announcements.',
+      href: '/display/announcements',
+      label: 'Pinned display',
+    },
     {
       title: 'Manage Posts',
       description: 'Create, edit, and remove teaching or community posts.',
@@ -192,12 +210,12 @@ export default async function DashboardPage() {
       href: '/announcements',
       label: 'Teacher notices',
     },
-{
-  title: 'Announcement Display',
-  description: 'Open a public display screen for pinned announcements.',
-  href: '/display/announcements',
-  label: 'Pinned display',
-},
+    {
+      title: 'Announcement Display',
+      description: 'Open a public display screen for pinned announcements.',
+      href: '/display/announcements',
+      label: 'Pinned display',
+    },
     {
       title: 'Manage Posts',
       description: 'Create and manage teaching posts.',
@@ -206,13 +224,32 @@ export default async function DashboardPage() {
     },
   ]
 
-  const managementCards = ['owner', 'admin'].includes(role)
-    ? adminCards
-    : role === 'moderator'
-      ? moderatorCards
-      : role === 'teacher'
-        ? teacherCards
-        : []
+  const managementCards =
+    role === 'owner'
+      ? ownerCards
+      : role === 'admin'
+        ? adminCards
+        : role === 'finance'
+          ? financeCards
+          : role === 'moderator'
+            ? moderatorCards
+            : role === 'teacher'
+              ? teacherCards
+              : []
+
+  const managementTitle =
+    role === 'owner'
+      ? 'Governance Tools'
+      : role === 'finance'
+        ? 'Finance Tools'
+        : 'Management Tools'
+
+  const managementDescription =
+    role === 'owner'
+      ? 'Owner tools are limited to governance: appointing or removing admins.'
+      : role === 'finance'
+        ? 'Finance tools are for Giving portal management and future financial records.'
+        : 'These controls are for assigned leadership and should be used carefully.'
 
   return (
     <main className='min-h-screen bg-[#050303] pb-28 text-white md:pb-10'>
@@ -296,11 +333,11 @@ export default async function DashboardPage() {
 
             <div className='mb-6 rounded-2xl border border-red-900/40 bg-[#160707] p-5 md:p-6'>
               <h2 className='text-xl font-bold text-red-300'>
-                Management Tools
+                {managementTitle}
               </h2>
 
               <p className='mt-2 text-sm leading-6 text-gray-300'>
-                These controls are for assigned leadership and should be used carefully.
+                {managementDescription}
               </p>
             </div>
 

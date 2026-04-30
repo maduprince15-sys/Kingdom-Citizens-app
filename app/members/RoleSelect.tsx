@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
+import { getAssignableRoles } from '../../lib/permissions'
 
 type Props = {
   userId: string
@@ -10,15 +11,17 @@ type Props = {
   actorRole: string | null
 }
 
-const ownerOptions = ['owner', 'admin', 'moderator', 'teacher', 'member']
-const adminOptions = ['moderator', 'teacher', 'member']
-
-export default function RoleSelect({ userId, email, currentRole, actorRole }: Props) {
+export default function RoleSelect({
+  userId,
+  email,
+  currentRole,
+  actorRole,
+}: Props) {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
 
-  const options = actorRole === 'owner' ? ownerOptions : adminOptions
+  const options = getAssignableRoles(actorRole)
 
   async function handleChange(nextRole: string) {
     if (nextRole === currentRole) return
@@ -45,6 +48,7 @@ export default function RoleSelect({ userId, email, currentRole, actorRole }: Pr
       })
 
       let result: any = {}
+
       try {
         result = await response.json()
       } catch {
@@ -67,6 +71,10 @@ export default function RoleSelect({ userId, email, currentRole, actorRole }: Pr
     }
   }
 
+  if (options.length === 0) {
+    return <p className='text-sm text-gray-400'>{currentRole ?? 'member'}</p>
+  }
+
   return (
     <div>
       <select
@@ -75,11 +83,17 @@ export default function RoleSelect({ userId, email, currentRole, actorRole }: Pr
         onChange={(e) => handleChange(e.target.value)}
         className='rounded border border-gray-600 bg-gray-900 px-2 py-1 text-white'
       >
-        {options.map((role) => (
-          <option key={role} value={role}>
-            {role}
-          </option>
-        ))}
+        <option value={currentRole ?? 'member'}>
+          {currentRole ?? 'member'}
+        </option>
+
+        {options
+          .filter((role) => role !== currentRole)
+          .map((role) => (
+            <option key={role} value={role}>
+              {role}
+            </option>
+          ))}
       </select>
 
       {message && <p className='mt-1 text-xs text-green-400'>{message}</p>}
