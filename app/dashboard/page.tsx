@@ -167,6 +167,12 @@ export default async function DashboardPage() {
       href: '/books',
       label: 'Bookstore',
     },
+{
+  title: 'Study Center',
+  description: 'Study Bible lessons, doctrine resources, Scripture notes, and teaching materials.',
+  href: '/study',
+  label: 'Study',
+},
     {
       title: 'Connect',
       description: 'Access official ministry links and channels.',
@@ -252,6 +258,12 @@ export default async function DashboardPage() {
       href: '/display/announcements',
       label: 'Pinned display',
     },
+{
+  title: 'Manage Study Center',
+  description: 'Create and manage Bible study resources, doctrine lessons, and teaching materials.',
+  href: '/admin/study',
+  label: 'Study resources',
+},
     {
       title: 'Manage Posts',
       description: 'Create, edit, and remove teaching or community posts.',
@@ -375,6 +387,12 @@ export default async function DashboardPage() {
       href: '/admin/groups',
       label: 'Study groups',
     },
+{
+  title: 'Manage Study Center',
+  description: 'Create and manage Bible study resources, doctrine lessons, and teaching materials.',
+  href: '/admin/study',
+  label: 'Study resources',
+},
     {
       title: 'Manage Announcements',
       description: 'Create and manage teaching or ministry announcements.',
