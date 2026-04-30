@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import { createClient } from '../../../lib/supabase/server'
 import PublicHeader from '../../components/PublicHeader'
 import PublicFooter from '../../components/PublicFooter'
+import StudyProgressControls from './StudyProgressControls'
 
 type Props = {
   params: Promise<{
@@ -14,15 +15,33 @@ export default async function StudyResourcePage({ params }: Props) {
   const { id } = await params
   const supabase = await createClient()
 
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
   const { data: resource, error: resourceError } = await supabase
     .from('study_resources')
     .select('*')
     .eq('id', id)
     .eq('is_published', true)
+    .eq('is_public', true)
     .single()
 
   if (resourceError || !resource) {
     notFound()
+  }
+
+  let progress = null
+
+  if (user) {
+    const { data } = await supabase
+      .from('study_progress')
+      .select('is_bookmarked, is_completed, progress_percent, personal_note')
+      .eq('user_id', user.id)
+      .eq('resource_id', id)
+      .maybeSingle()
+
+    progress = data
   }
 
   return (
@@ -53,19 +72,21 @@ export default async function StudyResourcePage({ params }: Props) {
               Back to Study Center
             </Link>
 
-            <Link
-              href='/dashboard'
-              className='rounded-full border border-yellow-700 px-4 py-2 text-sm text-yellow-300 hover:bg-yellow-900/20'
-            >
-              Member Dashboard
-            </Link>
-
-            <Link
-              href='/login'
-              className='rounded-full bg-yellow-500 px-4 py-2 text-sm font-bold text-black hover:bg-yellow-400'
-            >
-              Login
-            </Link>
+            {user ? (
+              <Link
+                href='/dashboard'
+                className='rounded-full border border-yellow-700 px-4 py-2 text-sm text-yellow-300 hover:bg-yellow-900/20'
+              >
+                Member Dashboard
+              </Link>
+            ) : (
+              <Link
+                href='/login'
+                className='rounded-full bg-yellow-500 px-4 py-2 text-sm font-bold text-black hover:bg-yellow-400'
+              >
+                Login to Save Progress
+              </Link>
+            )}
           </div>
         </div>
       </section>
@@ -156,6 +177,39 @@ export default async function StudyResourcePage({ params }: Props) {
             </a>
           )}
         </div>
+
+        {user ? (
+          <StudyProgressControls
+            resourceId={resource.id}
+            userId={user.id}
+            initialIsBookmarked={progress?.is_bookmarked ?? false}
+            initialIsCompleted={progress?.is_completed ?? false}
+            initialProgressPercent={progress?.progress_percent ?? 0}
+            initialPersonalNote={progress?.personal_note ?? ''}
+          />
+        ) : (
+          <div className='mt-8 rounded-3xl border border-yellow-900/40 bg-[#120707] p-5 md:p-6'>
+            <p className='text-xs uppercase tracking-[0.25em] text-yellow-500'>
+              Member Study Progress
+            </p>
+
+            <h2 className='mt-2 text-2xl font-bold'>
+              Login to Save Your Progress
+            </h2>
+
+            <p className='mt-2 text-sm leading-6 text-gray-400'>
+              Public visitors can read this study. Signed-in members can bookmark it,
+              mark it completed, save progress percentage, and keep private study notes.
+            </p>
+
+            <Link
+              href='/login'
+              className='mt-5 inline-block rounded-full bg-yellow-500 px-5 py-3 text-sm font-bold text-black hover:bg-yellow-400'
+            >
+              Login
+            </Link>
+          </div>
+        )}
       </section>
 
       <PublicFooter />
