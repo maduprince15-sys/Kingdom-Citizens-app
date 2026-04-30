@@ -1,5 +1,6 @@
 ﻿import { NextResponse } from 'next/server'
 import { createClient } from '../../../../lib/supabase/server'
+import { createAdminClient } from '../../../../lib/supabase/admin'
 import { canCreatePosts } from '../../../../lib/permissions'
 
 export async function POST(request: Request) {
@@ -38,7 +39,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Title and content are required.' }, { status: 400 })
   }
 
-  const { error } = await supabase.from('app_posts').insert({
+  const admin = createAdminClient()
+
+  const { error } = await admin.from('app_posts').insert({
     title,
     content,
     image_url,
