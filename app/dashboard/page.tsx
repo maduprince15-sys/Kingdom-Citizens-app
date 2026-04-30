@@ -2,6 +2,37 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '../../lib/supabase/server'
 import LogoutButton from './LogoutButton'
+import DashboardNoticePreview from '../components/DashboardNoticePreview'
+
+const months = [
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
+]
+
+function getMonthName(month: number | null | undefined) {
+  if (!month || month < 1 || month > 12) return ''
+  return months[month - 1]
+}
+
+function getText(value: any) {
+  if (!value) return null
+  return String(value)
+}
+
+function getDateText(item: any) {
+  const date = item.created_at || null
+  return date
+}
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -30,6 +61,80 @@ export default async function DashboardPage() {
     .eq('recipient_id', user.id)
     .is('read_at', null)
     .is('recipient_archived_at', null)
+
+  const today = new Date()
+  const currentMonth = today.getMonth() + 1
+  const currentDay = today.getDate()
+
+  const { data: birthdayProfiles } = await supabase
+    .from('profiles')
+    .select('id, full_name, email, birthday_month, birthday_day, show_birthday, avatar_url')
+    .eq('show_birthday', true)
+    .eq('birthday_month', currentMonth)
+    .eq('birthday_day', currentDay)
+
+  const { data: pinnedAnnouncements } = await supabase
+    .from('app_announcements')
+    .select('*')
+    .eq('is_pinned', true)
+    .order('created_at', { ascending: false })
+    .limit(3)
+
+  const { data: pinnedPosts } = await supabase
+    .from('app_posts')
+    .select('*')
+    .eq('is_pinned', true)
+    .order('created_at', { ascending: false })
+    .limit(3)
+
+  const birthdaySlides =
+    birthdayProfiles?.map((profile: any) => ({
+      id: `birthday-${profile.id}`,
+      type: 'birthday',
+      label: "Today's Birthday",
+      title: profile.full_name || profile.email || 'Citizen',
+      subtitle: 'The Kingdom Citizens celebrates you.',
+      description:
+        'May you grow in Christ, in grace, in wisdom, and in the purpose of God.',
+      avatar_url: profile.avatar_url || null,
+      image_url: null,
+      date_text: `${getMonthName(profile.birthday_month)} ${profile.birthday_day}`,
+      link_url: null,
+    })) || []
+
+  const announcementSlides =
+    pinnedAnnouncements?.map((item: any) => ({
+      id: `announcement-${item.id}`,
+      type: 'announcement',
+      label: 'Pinned Announcement',
+      title: getText(item.title) || 'Announcement',
+      subtitle: null,
+      description: getText(item.content || item.description),
+      image_url: item.image_url || null,
+      avatar_url: null,
+      date_text: getDateText(item),
+      link_url: item.video_url || null,
+    })) || []
+
+  const postSlides =
+    pinnedPosts?.map((item: any) => ({
+      id: `post-${item.id}`,
+      type: 'post',
+      label: 'Pinned Post',
+      title: getText(item.title) || 'Pinned Post',
+      subtitle: null,
+      description: getText(item.content || item.body || item.description),
+      image_url: item.image_url || null,
+      avatar_url: null,
+      date_text: getDateText(item),
+      link_url: item.video_url || null,
+    })) || []
+
+  const noticeSlides = [
+    ...birthdaySlides,
+    ...announcementSlides,
+    ...postSlides,
+  ]
 
   const memberCards = [
     {
@@ -344,31 +449,7 @@ export default async function DashboardPage() {
       </section>
 
       <section className='mx-auto max-w-6xl px-4 py-8 md:px-8'>
-        <Link
-          href='/display/notice-board'
-          className='group mb-8 block overflow-hidden rounded-[2rem] border border-yellow-700/50 bg-gradient-to-br from-[#2a0909] via-[#120707] to-black p-6 shadow-2xl shadow-black/40 transition hover:-translate-y-1 hover:border-yellow-400 md:p-8'
-        >
-          <div className='flex flex-col gap-6 md:flex-row md:items-center md:justify-between'>
-            <div>
-              <p className='text-xs uppercase tracking-[0.35em] text-yellow-400'>
-                Kingdom Citizens Notice Board
-              </p>
-
-              <h2 className='mt-3 text-3xl font-black text-white md:text-5xl'>
-                Live Community Notice Screen
-              </h2>
-
-              <p className='mt-4 max-w-3xl text-sm leading-7 text-gray-300 md:text-base'>
-                View birthdays, pinned announcements, pinned posts, pinned events, projects,
-                meetings, and important Citizens updates in a bold rotating display.
-              </p>
-            </div>
-
-            <div className='rounded-full bg-yellow-500 px-6 py-3 text-center text-sm font-black text-black shadow-lg shadow-yellow-900/30 group-hover:bg-yellow-400'>
-              Open Notice Board →
-            </div>
-          </div>
-        </Link>
+        <DashboardNoticePreview slides={noticeSlides} intervalMs={12000} />
 
         <div className='mb-6 rounded-2xl border border-yellow-900/40 bg-[#120707] p-5 md:p-6'>
           <h2 className='text-xl font-bold text-yellow-300'>
