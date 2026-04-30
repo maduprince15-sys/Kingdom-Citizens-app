@@ -20,12 +20,30 @@ const getURL = () => {
   return 'http://localhost:3000/'
 }
 
+const months = [
+  { value: '1', label: 'January' },
+  { value: '2', label: 'February' },
+  { value: '3', label: 'March' },
+  { value: '4', label: 'April' },
+  { value: '5', label: 'May' },
+  { value: '6', label: 'June' },
+  { value: '7', label: 'July' },
+  { value: '8', label: 'August' },
+  { value: '9', label: 'September' },
+  { value: '10', label: 'October' },
+  { value: '11', label: 'November' },
+  { value: '12', label: 'December' },
+]
+
+const days = Array.from({ length: 31 }, (_, index) => String(index + 1))
+
 export default function RegisterPage() {
   const router = useRouter()
   const supabase = createClient()
 
   const [fullName, setFullName] = useState('')
-  const [phone, setPhone] = useState('')
+  const [birthdayMonth, setBirthdayMonth] = useState('')
+  const [birthdayDay, setBirthdayDay] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
@@ -54,6 +72,15 @@ export default function RegisterPage() {
     setLoading(true)
     setMessage('')
 
+    const monthNumber = birthdayMonth ? Number(birthdayMonth) : null
+    const dayNumber = birthdayDay ? Number(birthdayDay) : null
+
+    if (!monthNumber || !dayNumber) {
+      setMessage('Please select your birthday month and day.')
+      setLoading(false)
+      return
+    }
+
     const { error } = await supabase.auth.signUp({
       email,
       password,
@@ -61,7 +88,9 @@ export default function RegisterPage() {
         emailRedirectTo: `${getURL()}auth/callback`,
         data: {
           full_name: fullName,
-          phone_number: phone,
+          birthday_month: monthNumber,
+          birthday_day: dayNumber,
+          show_birthday: true,
         },
       },
     })
@@ -128,15 +157,44 @@ export default function RegisterPage() {
 
               <div>
                 <label className='mb-2 block text-sm text-gray-300'>
-                  Phone Number
+                  Birthday Month
                 </label>
-                <input
-                  type='text'
-                  placeholder='Enter your phone number'
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  className='w-full rounded-xl border border-gray-300 bg-white p-3 text-black placeholder-gray-500'
-                />
+                <select
+                  value={birthdayMonth}
+                  onChange={(e) => setBirthdayMonth(e.target.value)}
+                  className='w-full rounded-xl border border-gray-300 bg-white p-3 text-black'
+                  required
+                >
+                  <option value=''>Select month</option>
+                  {months.map((month) => (
+                    <option key={month.value} value={month.value}>
+                      {month.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className='mb-2 block text-sm text-gray-300'>
+                  Birthday Day
+                </label>
+                <select
+                  value={birthdayDay}
+                  onChange={(e) => setBirthdayDay(e.target.value)}
+                  className='w-full rounded-xl border border-gray-300 bg-white p-3 text-black'
+                  required
+                >
+                  <option value=''>Select day</option>
+                  {days.map((day) => (
+                    <option key={day} value={day}>
+                      {day}
+                    </option>
+                  ))}
+                </select>
+
+                <p className='mt-2 text-xs leading-5 text-gray-400'>
+                  We collect only month and day for birthday celebrations. No birth year is collected.
+                </p>
               </div>
 
               <div>

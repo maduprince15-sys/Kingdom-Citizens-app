@@ -21,6 +21,30 @@ export async function GET(request: Request) {
       } = await supabase.auth.getUser()
 
       if (user) {
+        const { data: existingProfile } = await supabase
+          .from('profiles')
+          .select('id, role, phone, birthday_month, birthday_day, show_birthday')
+          .eq('id', user.id)
+          .maybeSingle()
+
+        const birthdayMonth =
+          user.user_metadata?.birthday_month !== undefined &&
+          user.user_metadata?.birthday_month !== null
+            ? Number(user.user_metadata.birthday_month)
+            : existingProfile?.birthday_month ?? null
+
+        const birthdayDay =
+          user.user_metadata?.birthday_day !== undefined &&
+          user.user_metadata?.birthday_day !== null
+            ? Number(user.user_metadata.birthday_day)
+            : existingProfile?.birthday_day ?? null
+
+        const showBirthday =
+          user.user_metadata?.show_birthday !== undefined &&
+          user.user_metadata?.show_birthday !== null
+            ? Boolean(user.user_metadata.show_birthday)
+            : existingProfile?.show_birthday ?? true
+
         await supabase.from('profiles').upsert({
           id: user.id,
           email: user.email,
@@ -30,10 +54,14 @@ export async function GET(request: Request) {
             user.user_metadata?.display_name ||
             'New Member',
           phone:
+            existingProfile?.phone ||
             user.user_metadata?.phone_number ||
             user.user_metadata?.phone ||
             null,
-          role: 'member',
+          birthday_month: birthdayMonth,
+          birthday_day: birthdayDay,
+          show_birthday: showBirthday,
+          role: existingProfile?.role || 'member',
         })
       }
 
