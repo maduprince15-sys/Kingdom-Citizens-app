@@ -486,18 +486,60 @@ export default async function DashboardPage() {
               </div>
             </div>
 
-            <Link
-              href='/'
-              className='rounded-full border border-yellow-700/70 px-4 py-2 text-center text-sm text-yellow-300 hover:bg-yellow-700/20'
-            >
-              View Public Site
-            </Link>
+            <div className='flex flex-col gap-3 sm:flex-row sm:items-center'>
+              <Link
+                href='/notifications'
+                className='relative rounded-full border border-yellow-700/70 px-4 py-2 text-center text-sm font-bold text-yellow-300 hover:bg-yellow-700/20'
+              >
+                🔔 Notifications
+                {unreadNotificationCount ? (
+                  <span className='ml-2 rounded-full bg-yellow-500 px-2 py-0.5 text-xs font-black text-black'>
+                    {unreadNotificationCount}
+                  </span>
+                ) : null}
+              </Link>
+
+              <Link
+                href='/'
+                className='rounded-full border border-yellow-700/70 px-4 py-2 text-center text-sm text-yellow-300 hover:bg-yellow-700/20'
+              >
+                View Public Site
+              </Link>
+            </div>
           </div>
         </div>
       </section>
 
       <section className='mx-auto max-w-6xl px-4 py-8 md:px-8'>
         <DashboardNoticePreview slides={noticeSlides} intervalMs={12000} />
+
+        {unreadNotificationCount ? (
+          <Link
+            href='/notifications'
+            className='mb-8 block rounded-2xl border border-yellow-600/60 bg-yellow-500 p-5 text-black shadow-lg shadow-yellow-950/40 transition hover:bg-yellow-400'
+          >
+            <div className='flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
+              <div>
+                <p className='text-xs font-black uppercase tracking-[0.25em]'>
+                  New Notifications
+                </p>
+
+                <h2 className='mt-2 text-2xl font-black'>
+                  You have {unreadNotificationCount} unread notification
+                  {unreadNotificationCount === 1 ? '' : 's'}.
+                </h2>
+
+                <p className='mt-2 text-sm font-semibold'>
+                  Open your notification center to view recent messages, reminders, and Citizens updates.
+                </p>
+              </div>
+
+              <div className='rounded-full bg-black px-5 py-3 text-center text-sm font-black text-yellow-300'>
+                Open Notifications →
+              </div>
+            </div>
+          </Link>
+        ) : null}
 
         <div className='mb-6 rounded-2xl border border-yellow-900/40 bg-[#120707] p-5 md:p-6'>
           <h2 className='text-xl font-bold text-yellow-300'>
