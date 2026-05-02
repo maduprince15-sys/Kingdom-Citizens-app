@@ -41,9 +41,13 @@ export default async function MessagesPage() {
 
           <div className='mt-3 flex flex-col gap-4 md:flex-row md:items-end md:justify-between'>
             <div>
-              <h1 className='text-3xl font-bold md:text-5xl'>Inbox</h1>
+              <h1 className='text-3xl font-bold md:text-5xl'>
+                Messages
+              </h1>
+
               <p className='mt-3 max-w-2xl text-sm leading-6 text-gray-300'>
-                Your member inbox for official and board communications.
+                Your communication center for private messages, sent messages,
+                and the Citizens group chat.
               </p>
             </div>
 
@@ -62,6 +66,13 @@ export default async function MessagesPage() {
                 Sent
               </Link>
 
+              <Link
+                href='/chat'
+                className='rounded-full border border-yellow-700/70 px-4 py-2 text-sm text-yellow-300 hover:bg-yellow-700/20'
+              >
+                Group Chat
+              </Link>
+
               {canSend && (
                 <Link
                   href='/messages/new'
@@ -76,8 +87,23 @@ export default async function MessagesPage() {
       </section>
 
       <section className='mx-auto max-w-5xl px-4 py-8 md:px-8'>
+        <div className='mb-6 rounded-2xl border border-yellow-900/40 bg-[#120707] p-5 md:p-6'>
+          <p className='text-xs uppercase tracking-[0.25em] text-yellow-500'>
+            Inbox
+          </p>
+
+          <h2 className='mt-2 text-2xl font-bold text-white'>
+            Private Messages
+          </h2>
+
+          <p className='mt-2 text-sm leading-6 text-gray-400'>
+            Read direct messages sent to your account. Use Group Chat for open
+            members-only discussion.
+          </p>
+        </div>
+
         {error && (
-          <div className='rounded border border-red-700 bg-red-950/40 p-4 text-red-300'>
+          <div className='mb-6 rounded border border-red-700 bg-red-950/40 p-4 text-red-300'>
             Error loading messages: {error.message}
           </div>
         )}
@@ -127,7 +153,7 @@ export default async function MessagesPage() {
           })}
 
           {messages?.length === 0 && (
-            <div className='rounded-2xl border border-yellow-900/30 p-6 text-gray-400'>
+            <div className='rounded-2xl border border-yellow-900/30 bg-[#120707] p-6 text-gray-400'>
               No inbox messages.
             </div>
           )}

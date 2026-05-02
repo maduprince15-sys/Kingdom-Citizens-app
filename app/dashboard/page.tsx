@@ -156,6 +156,18 @@ export default async function DashboardPage() {
       label: 'Alerts',
     },
     {
+      title: `Messages${unreadMessageCount ? ` (${unreadMessageCount} unread)` : ''}`,
+      description: 'Read private messages, sent messages, and access the Citizens group chat.',
+      href: '/messages',
+      label: 'Communication',
+    },
+    {
+      title: 'Study Center',
+      description: 'Study Bible lessons, doctrine resources, Scripture notes, teaching materials, and read the Bible.',
+      href: '/study',
+      label: 'Study',
+    },
+    {
       title: 'My Citizen Records',
       description: 'View your attendance, contribution, task, service, and training records.',
       href: '/my-records',
@@ -167,59 +179,11 @@ export default async function DashboardPage() {
       href: '/groups',
       label: 'Groups',
     },
-{
-  title: 'Group Chat',
-  description: 'Join the members-only Citizens group discussion room.',
-  href: '/chat',
-  label: 'Community chat',
-},
-    {
-      title: `Messages${unreadMessageCount ? ` (${unreadMessageCount} unread)` : ''}`,
-      description: 'Read inbox messages and send messages to board members.',
-      href: '/messages',
-      label: 'Inbox',
-    },
     {
       title: 'Books',
       description: 'Access The Kingdom Citizens book and teaching resource area.',
       href: '/books',
       label: 'Bookstore',
-    },
-    {
-      title: 'Study Center',
-      description: 'Study Bible lessons, doctrine resources, Scripture notes, teaching materials, and read the Bible.',
-      href: '/study',
-      label: 'Study',
-    },
-    {
-      title: 'My Study Progress',
-      description: 'Continue saved studies, review bookmarks, completed lessons, and private study notes.',
-      href: '/study/progress',
-      label: 'Study progress',
-    },
-    {
-      title: 'Connect',
-      description: 'Access official ministry links and channels.',
-      href: '/connect',
-      label: 'Media links',
-    },
-    {
-      title: 'Meetings',
-      description: 'Access meeting links, fellowship gatherings, and live sessions.',
-      href: '/meetings',
-      label: 'Join live',
-    },
-    {
-      title: 'Announcements',
-      description: 'Read official announcements and ministry updates.',
-      href: '/announcements',
-      label: 'Official notices',
-    },
-    {
-      title: 'Posts',
-      description: 'Read and engage with teaching or community posts.',
-      href: '/posts',
-      label: 'Teaching posts',
     },
     {
       title: 'Prayer Wall',
@@ -233,8 +197,19 @@ export default async function DashboardPage() {
       href: '/calendar',
       label: 'Important dates',
     },
+    {
+      title: 'Connect',
+      description: 'Access official ministry links and channels.',
+      href: '/connect',
+      label: 'Media links',
+    },
+    {
+      title: 'Meetings',
+      description: 'Access meeting links, fellowship gatherings, and live sessions.',
+      href: '/meetings',
+      label: 'Join live',
+    },
   ]
-
   const ownerCards = [
     {
       title: 'Members',
