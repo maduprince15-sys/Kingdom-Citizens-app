@@ -35,7 +35,8 @@ export default async function StudyCenterPage() {
               </p>
 
               <p className='mt-3 max-w-3xl text-sm leading-7 text-yellow-300'>
-                Public visitors can read published resources. Signed-in members will later be able to save progress, continue studies, and keep study records.
+                Public visitors can read published resources. Signed-in members can save progress,
+                continue studies, keep study records, and join member-only study discussions.
               </p>
             </div>
 
@@ -59,31 +60,92 @@ export default async function StudyCenterPage() {
       </section>
 
       <section className='mx-auto max-w-6xl px-4 py-8 md:px-8'>
-<div className='mb-8 rounded-[2rem] border border-yellow-700/50 bg-gradient-to-br from-[#2a0909] via-[#120707] to-black p-6 shadow-2xl shadow-black/40 md:p-8'>
-  <p className='text-xs uppercase tracking-[0.35em] text-yellow-400'>
-    Scripture
-  </p>
+        <div className='grid grid-cols-1 gap-6 lg:grid-cols-3'>
+          <div className='rounded-[2rem] border border-yellow-700/50 bg-gradient-to-br from-[#2a0909] via-[#120707] to-black p-6 shadow-2xl shadow-black/40 md:p-8'>
+            <p className='text-xs uppercase tracking-[0.35em] text-yellow-400'>
+              Scripture
+            </p>
 
-  <h2 className='mt-3 text-3xl font-black text-white md:text-5xl'>
-    Bible Reader
-  </h2>
+            <h2 className='mt-3 text-3xl font-black text-white'>
+              Bible Reader
+            </h2>
 
-  <p className='mt-4 max-w-3xl text-sm leading-7 text-gray-300 md:text-base'>
-    Search and read Scripture directly inside the Study Center.
-  </p>
+            <p className='mt-4 text-sm leading-7 text-gray-300'>
+              Search and read Scripture directly inside the Study Center.
+            </p>
 
-  <Link
-    href='/study/bible'
-    className='mt-6 inline-block rounded-full bg-yellow-500 px-6 py-3 text-sm font-black text-black hover:bg-yellow-400'
-  >
-    Open Bible Reader →
-  </Link>
-</div>
+            <Link
+              href='/study/bible'
+              className='mt-6 inline-block rounded-full bg-yellow-500 px-6 py-3 text-sm font-black text-black hover:bg-yellow-400'
+            >
+              Open Bible Reader →
+            </Link>
+          </div>
+
+          <div className='rounded-[2rem] border border-yellow-700/50 bg-gradient-to-br from-[#120707] via-black to-[#2a0909] p-6 shadow-2xl shadow-black/40 md:p-8'>
+            <p className='text-xs uppercase tracking-[0.35em] text-yellow-400'>
+              Member Progress
+            </p>
+
+            <h2 className='mt-3 text-3xl font-black text-white'>
+              My Study Progress
+            </h2>
+
+            <p className='mt-4 text-sm leading-7 text-gray-300'>
+              Signed-in members can continue saved studies, review bookmarks,
+              completed lessons, and private notes.
+            </p>
+
+            <Link
+              href='/study/progress'
+              className='mt-6 inline-block rounded-full bg-yellow-500 px-6 py-3 text-sm font-black text-black hover:bg-yellow-400'
+            >
+              Open My Study Progress →
+            </Link>
+          </div>
+
+          <div className='rounded-[2rem] border border-yellow-700/50 bg-gradient-to-br from-[#120707] via-black to-[#2a0909] p-6 shadow-2xl shadow-black/40 md:p-8'>
+            <p className='text-xs uppercase tracking-[0.35em] text-yellow-400'>
+              Member Discussion
+            </p>
+
+            <h2 className='mt-3 text-3xl font-black text-white'>
+              Bible Study Discussion
+            </h2>
+
+            <p className='mt-4 text-sm leading-7 text-gray-300'>
+              Signed-in members can discuss Bible studies, doctrine lessons,
+              questions, and spiritual formation topics together.
+            </p>
+
+            <Link
+              href='/study/discussion'
+              className='mt-6 inline-block rounded-full bg-yellow-500 px-6 py-3 text-sm font-black text-black hover:bg-yellow-400'
+            >
+              Open Study Discussion →
+            </Link>
+          </div>
+        </div>
+
         {resourcesError && (
-          <div className='mb-6 rounded border border-red-700 bg-red-950/40 p-4 text-red-300'>
+          <div className='mt-8 rounded border border-red-700 bg-red-950/40 p-4 text-red-300'>
             Error loading study resources: {resourcesError.message}
           </div>
         )}
+
+        <div className='mt-10 mb-6 rounded-2xl border border-yellow-900/40 bg-[#120707] p-5 md:p-6'>
+          <p className='text-xs uppercase tracking-[0.35em] text-yellow-500'>
+            Study Library
+          </p>
+
+          <h2 className='mt-2 text-2xl font-bold text-white md:text-3xl'>
+            Published Study Resources
+          </h2>
+
+          <p className='mt-3 max-w-3xl text-sm leading-7 text-gray-400'>
+            Open Bible lessons, doctrine resources, Scripture-based notes, and teaching materials.
+          </p>
+        </div>
 
         <div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3'>
           {resources?.map((resource) => (
@@ -135,48 +197,6 @@ export default async function StudyCenterPage() {
           )}
         </div>
       </section>
-<div className='mb-8 rounded-[2rem] border border-yellow-700/50 bg-gradient-to-br from-[#120707] via-black to-[#2a0909] p-6 shadow-2xl shadow-black/40 md:p-8'>
-  <p className='text-xs uppercase tracking-[0.35em] text-yellow-400'>
-    Member Progress
-  </p>
-
-  <h2 className='mt-3 text-3xl font-black text-white md:text-5xl'>
-    My Study Progress
-  </h2>
-
-  <p className='mt-4 max-w-3xl text-sm leading-7 text-gray-300 md:text-base'>
-    Signed-in members can continue saved studies, review bookmarks, see completed lessons,
-    and revisit private notes.
-  </p>
-<div className='mb-8 rounded-[2rem] border border-yellow-700/50 bg-gradient-to-br from-[#120707] via-black to-[#2a0909] p-6 shadow-2xl shadow-black/40 md:p-8'>
-  <p className='text-xs uppercase tracking-[0.35em] text-yellow-400'>
-    Member Discussion
-  </p>
-
-  <h2 className='mt-3 text-3xl font-black text-white md:text-5xl'>
-    Bible Study Discussion
-  </h2>
-
-  <p className='mt-4 max-w-3xl text-sm leading-7 text-gray-300 md:text-base'>
-    Signed-in members can discuss Bible studies, doctrine lessons, questions,
-    and spiritual formation topics together.
-  </p>
-
-  <Link
-    href='/study/discussion'
-    className='mt-6 inline-block rounded-full bg-yellow-500 px-6 py-3 text-sm font-black text-black hover:bg-yellow-400'
-  >
-    Open Study Discussion →
-  </Link>
-</div>
-
-  <Link
-    href='/study/progress'
-    className='mt-6 inline-block rounded-full bg-yellow-500 px-6 py-3 text-sm font-black text-black hover:bg-yellow-400'
-  >
-    Open My Study Progress →
-  </Link>
-</div>
 
       <PublicFooter />
     </main>
