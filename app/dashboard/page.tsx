@@ -167,6 +167,12 @@ export default async function DashboardPage() {
       href: '/groups',
       label: 'Groups',
     },
+{
+  title: 'Group Chat',
+  description: 'Join the members-only Citizens group discussion room.',
+  href: '/chat',
+  label: 'Community chat',
+},
     {
       title: `Messages${unreadMessageCount ? ` (${unreadMessageCount} unread)` : ''}`,
       description: 'Read inbox messages and send messages to board members.',
