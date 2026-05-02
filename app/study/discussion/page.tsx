@@ -1,9 +1,9 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { createClient } from '../../lib/supabase/server'
-import ChatRoom from './ChatRoom'
+import { createClient } from '../../../lib/supabase/server'
+import ChatRoom from '../../chat/ChatRoom'
 
-export default async function ChatPage() {
+export default async function StudyDiscussionPage() {
   const supabase = await createClient()
 
   const {
@@ -36,7 +36,7 @@ export default async function ChatPage() {
   const { data: messages, error: messagesError } = await supabase
     .from('chat_messages')
     .select('id, sender_id, sender_name, sender_role, body, chat_room, is_deleted, created_at')
-    .eq('chat_room', 'general')
+    .eq('chat_room', 'study-general')
     .order('created_at', { ascending: false })
     .limit(100)
 
@@ -45,38 +45,39 @@ export default async function ChatPage() {
       <section className='border-b border-yellow-900/40 bg-gradient-to-br from-black via-[#130606] to-[#260909] px-4 py-8 md:px-8'>
         <div className='mx-auto max-w-6xl'>
           <p className='text-xs uppercase tracking-[0.35em] text-yellow-500'>
-            The Kingdom Citizens
+            Study Center
           </p>
 
           <div className='mt-3 flex flex-col gap-4 md:flex-row md:items-end md:justify-between'>
             <div>
               <h1 className='text-3xl font-bold md:text-5xl'>
-                Group Chat
+                Bible Study Discussion
               </h1>
 
               <p className='mt-3 max-w-2xl text-sm leading-6 text-gray-300 md:text-base'>
-                A members-only group discussion room for The Kingdom Citizens.
+                A members-only discussion room for Bible study, doctrine questions,
+                lesson reflections, and spiritual formation conversations.
               </p>
 
               <p className='mt-3 max-w-2xl text-xs leading-5 text-gray-500'>
-                Privacy model: authenticated-only access, Supabase RLS, HTTPS transport,
-                and admin/moderator moderation.
+                Public visitors can read Study Center resources, but discussion is available
+                only to signed-in Citizens.
               </p>
             </div>
 
             <div className='flex flex-wrap gap-3'>
               <Link
+                href='/study'
+                className='rounded-full border border-yellow-700/70 px-4 py-2 text-center text-sm text-yellow-300 hover:bg-yellow-700/20'
+              >
+                Study Center
+              </Link>
+
+              <Link
                 href='/dashboard'
                 className='rounded-full border border-yellow-700/70 px-4 py-2 text-center text-sm text-yellow-300 hover:bg-yellow-700/20'
               >
                 Dashboard
-              </Link>
-
-              <Link
-                href='/messages'
-                className='rounded-full border border-yellow-700/70 px-4 py-2 text-center text-sm text-yellow-300 hover:bg-yellow-700/20'
-              >
-                Private Messages
               </Link>
             </div>
           </div>
@@ -86,23 +87,23 @@ export default async function ChatPage() {
       <section className='mx-auto max-w-6xl px-4 py-8 md:px-8'>
         {messagesError && (
           <div className='mb-6 rounded border border-red-700 bg-red-950/40 p-4 text-red-300'>
-            Error loading chat messages: {messagesError.message}
+            Error loading study discussion: {messagesError.message}
           </div>
         )}
 
         <ChatRoom
-  messages={messages || []}
-  currentUserId={user.id}
-  currentUserName={currentUserName}
-  currentUserRole={role}
-  canModerate={canModerate}
-  chatRoom='general'
-  label='General Group Chat'
-  title='Citizens Discussion'
-  subtitle='Members-only chat'
-  badgeText='KC'
-  placeholder='Write a message to the Citizens...'
-/>
+          messages={messages || []}
+          currentUserId={user.id}
+          currentUserName={currentUserName}
+          currentUserRole={role}
+          canModerate={canModerate}
+          chatRoom='study-general'
+          label='Bible Study Discussion'
+          title='Study Center Group Discussion'
+          subtitle='Members-only Bible study discussion'
+          badgeText='BS'
+          placeholder='Ask a study question or share a reflection...'
+        />
       </section>
     </main>
   )

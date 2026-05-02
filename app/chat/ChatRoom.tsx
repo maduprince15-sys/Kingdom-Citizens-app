@@ -21,6 +21,12 @@ type Props = {
   currentUserName: string
   currentUserRole: string
   canModerate: boolean
+  chatRoom?: string
+  title?: string
+  subtitle?: string
+  label?: string
+  badgeText?: string
+  placeholder?: string
 }
 
 export default function ChatRoom({
@@ -29,6 +35,12 @@ export default function ChatRoom({
   currentUserName,
   currentUserRole,
   canModerate,
+  chatRoom = 'general',
+  title = 'Citizens Discussion',
+  subtitle = 'Members-only chat',
+  label = 'General Group Chat',
+  badgeText = 'KC',
+  placeholder = 'Write a message...',
 }: Props) {
   const router = useRouter()
   const supabase = createClient()
@@ -52,14 +64,14 @@ export default function ChatRoom({
 
   useEffect(() => {
     const channel = supabase
-      .channel('general-chat-room')
+      .channel(`chat-room-${chatRoom}`)
       .on(
         'postgres_changes',
         {
           event: 'INSERT',
           schema: 'public',
           table: 'chat_messages',
-          filter: 'chat_room=eq.general',
+          filter: `chat_room=eq.${chatRoom}`,
         },
         (payload) => {
           const newMessage = payload.new as ChatMessage
@@ -81,7 +93,7 @@ export default function ChatRoom({
           event: 'UPDATE',
           schema: 'public',
           table: 'chat_messages',
-          filter: 'chat_room=eq.general',
+          filter: `chat_room=eq.${chatRoom}`,
         },
         (payload) => {
           const updatedMessage = payload.new as ChatMessage
@@ -98,7 +110,7 @@ export default function ChatRoom({
     return () => {
       supabase.removeChannel(channel)
     }
-  }, [supabase])
+  }, [supabase, chatRoom])
 
   async function sendMessage(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -124,7 +136,7 @@ export default function ChatRoom({
       sender_name: currentUserName,
       sender_role: currentUserRole,
       body: cleanBody,
-      chat_room: 'general',
+      chat_room: chatRoom,
       is_deleted: false,
     })
 
@@ -139,45 +151,45 @@ export default function ChatRoom({
     setLoading(false)
   }
 
- async function deleteMessage(id: string, mine: boolean) {
-  const confirmed = window.confirm(
-    mine
-      ? 'Delete your message from the group chat?'
-      : 'Remove this chat message from the group chat?'
-  )
-
-  if (!confirmed) return
-
-  const response = await fetch('/api/chat/delete', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      messageId: id,
-    }),
-  })
-
-  const result = await response.json()
-
-  if (!response.ok) {
-    alert(result.error || 'Could not delete message.')
-    return
-  }
-
-  setChatMessages((current) =>
-    current.map((item) =>
-      item.id === id
-        ? {
-            ...item,
-            is_deleted: true,
-          }
-        : item
+  async function deleteMessage(id: string, mine: boolean) {
+    const confirmed = window.confirm(
+      mine
+        ? 'Delete your message from the group chat?'
+        : 'Remove this chat message from the group chat?'
     )
-  )
 
-  router.refresh()
-}
+    if (!confirmed) return
+
+    const response = await fetch('/api/chat/delete', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        messageId: id,
+      }),
+    })
+
+    const result = await response.json()
+
+    if (!response.ok) {
+      alert(result.error || 'Could not delete message.')
+      return
+    }
+
+    setChatMessages((current) =>
+      current.map((item) =>
+        item.id === id
+          ? {
+              ...item,
+              is_deleted: true,
+            }
+          : item
+      )
+    )
+
+    router.refresh()
+  }
 
   return (
     <div className='mx-auto max-w-4xl overflow-hidden rounded-[2rem] border border-yellow-900/40 bg-[#080404] shadow-2xl shadow-black/50'>
@@ -185,20 +197,20 @@ export default function ChatRoom({
         <div className='flex items-center justify-between gap-4'>
           <div>
             <p className='text-xs uppercase tracking-[0.25em] text-yellow-500'>
-              General Group Chat
+              {label}
             </p>
 
             <h2 className='mt-1 text-2xl font-black text-white'>
-              Citizens Discussion
+              {title}
             </h2>
 
             <p className='mt-1 text-xs text-gray-400'>
-              Members-only chat · posting as {currentUserName}
+              {subtitle} · posting as {currentUserName}
             </p>
           </div>
 
           <div className='flex h-12 w-12 items-center justify-center rounded-full bg-yellow-500 text-xl font-black text-black'>
-            KC
+            {badgeText}
           </div>
         </div>
       </div>
@@ -250,7 +262,7 @@ export default function ChatRoom({
                     }
                   >
                     {item.is_deleted
-                      ? 'This message was removed by a moderator.'
+                      ? 'This message was deleted.'
                       : item.body}
                   </p>
 
@@ -266,17 +278,17 @@ export default function ChatRoom({
                     </p>
 
                     {(canModerate || mine) && !item.is_deleted && (
-  <button
-    onClick={() => deleteMessage(item.id, mine)}
-    className={
-      mine
-        ? 'text-[11px] font-bold text-red-900 underline'
-        : 'text-[11px] font-bold text-red-300 underline'
-    }
-  >
-    {mine ? 'Delete' : 'Remove'}
-  </button>
-)}
+                      <button
+                        onClick={() => deleteMessage(item.id, mine)}
+                        className={
+                          mine
+                            ? 'text-[11px] font-bold text-red-900 underline'
+                            : 'text-[11px] font-bold text-red-300 underline'
+                        }
+                      >
+                        {mine ? 'Delete' : 'Remove'}
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
@@ -285,7 +297,7 @@ export default function ChatRoom({
 
           {orderedMessages.length === 0 && (
             <div className='rounded-3xl border border-yellow-900/30 bg-[#120707] p-6 text-center text-gray-400'>
-              No group chat messages yet. Start the first discussion.
+              No messages yet. Start the first discussion.
             </div>
           )}
 
@@ -302,7 +314,7 @@ export default function ChatRoom({
             value={body}
             onChange={(e) => setBody(e.target.value)}
             className='min-h-16 flex-1 resize-none rounded-2xl border border-yellow-900/40 bg-white p-3 text-black outline-none focus:border-yellow-500'
-            placeholder='Write a message...'
+            placeholder={placeholder}
           />
 
           <button
@@ -320,7 +332,7 @@ export default function ChatRoom({
         )}
 
         <p className='mt-3 text-xs text-gray-500'>
-          Protected group chat: logged-in members only. Admins and moderators can remove harmful messages.
+          Protected chat: logged-in members only. Admins and moderators can remove harmful messages.
         </p>
       </form>
     </div>
