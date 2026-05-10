@@ -30,11 +30,10 @@ export default async function PostsPage() {
   const canManagePosts = canCreate || canModerate
 
   const { data: rawPosts, error } = await supabase
-    .from('app_posts')
-    .select('id, title, content, image_url, video_url, author_id, author_name, created_at, is_pinned, pinned_at, expires_at, is_archived')
-    .order('is_pinned', { ascending: false })
-    .order('pinned_at', { ascending: false })
-    .order('created_at', { ascending: false })
+  .from('app_posts')
+  .select('id, title, content, image_url, video_url, author_id, author_name, created_at, is_pinned, expires_at, is_archived')
+  .order('is_pinned', { ascending: false })
+  .order('created_at', { ascending: false })
 
   const { data: comments } = await supabase
     .from('app_post_comments')
